@@ -23,7 +23,7 @@ export default function Profile() {
       const file = event.target.files[0];
       const data = new FormData();
       data.append("file", file);
-      data.append("upload_preset", "food-delivery");
+      data.append("upload_preset", "buy-me-coffee");
 
       const response = await fetch(
         `https://api.cloudinary.com/v1_1/dqc6hkkvs/upload`,
@@ -54,7 +54,7 @@ export default function Profile() {
 
   return (
     <>
-      <div className="flex flex-col items-center justify-start p-4">
+      <div className="flex flex-col items-center justify-start mt-[100px]">
         <div className="grid w-full max-w-sm items-center gap-1.5">
           <p className="pb-4">Complete your profile page</p>
 
@@ -156,7 +156,7 @@ export default function Profile() {
             onChange={handleChange}
             placeholder="https://"
           />
-          <button onClick={submitModal} className="bg-slate-600">
+          <button onClick={submitModal} className="bg-[rgba(24,24,27,0.2)] ">
             {" "}
             Continue{" "}
           </button>
