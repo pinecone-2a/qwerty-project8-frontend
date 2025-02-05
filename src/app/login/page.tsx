@@ -12,9 +12,12 @@ export default function Home (){
     const [currentStep,setCurrentStep]=useState<number>(1)
     // const [step ,setStep]=useState<number>(1)
 
-    // const Step1=()=>{
-    //     setStep(step)
-    // }
+    const changeSign=()=>{
+        setCurrentStep(currentStep-1)
+    }
+    const changeSign1=()=>{
+        setCurrentStep(currentStep-2)
+    }
     // const Step2=()=>{
     //     setStep(step+1)
     // }
@@ -38,8 +41,8 @@ export default function Home (){
         </div>
     <div className="bg-white ">
         {currentStep==1&&(<SignUp nextStep={nextStep} ></SignUp>)}
-        {currentStep==2&&(<SecondStep nextStep={nextStep}  ></SecondStep>)}
-       {currentStep==3&&(<ThirdStep nextStep={nextStep}backStep={backStep}></ThirdStep>)}
+        {currentStep==2&&(<SecondStep changeSign={changeSign} nextStep={nextStep}  ></SecondStep>)}
+       {currentStep==3&&(<ThirdStep changeSign1={changeSign1}  nextStep={nextStep}backStep={backStep}></ThirdStep>)}
        </div>
         
        
