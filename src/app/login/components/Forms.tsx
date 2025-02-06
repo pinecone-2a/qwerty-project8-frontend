@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/form"
 import { Form } from "@/components/ui/form";
 
+
  
 const formSecondrSchema = z.object({
   username: z.string().min(5,{ message: "Must be 5 or more characters long" }).max(50),
@@ -58,6 +59,8 @@ export function SignUp(nextStep:any){
     console.log(values)}
     return(
       <div>
+      <Button className="ml-[1000px] mt-5" onClick={nextStep.nextStep}>SignUp</Button>
+        
          <div className="ml-[450px] mt-[350px]">
       <div className="font-extrabold">Welcome back
         <p className="text-gray-500 font-medium">Connect email and set a password</p>
@@ -71,7 +74,7 @@ export function SignUp(nextStep:any){
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="shadcn" {...field} />
+                <Input className="w-[359px]" placeholder="Enter email here" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -83,7 +86,7 @@ export function SignUp(nextStep:any){
           <FormItem>
             <FormLabel>Password</FormLabel>
             <FormControl>
-              <Input placeholder="shadcn" {...field} />
+              <Input className="w-[359px]" placeholder="Enter password here" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -97,8 +100,8 @@ export function SignUp(nextStep:any){
     )
   
 }
-export function SecondStep(nextStep:any){
-  // console.log( typeof nextStep.nextStep)
+export function SecondStep({ changeSign,nextStep}:any){
+  console.log( typeof nextStep)
   const form2 = useForm<z.infer<typeof formSecondrSchema>>({
     resolver: zodResolver(formSecondrSchema),
     defaultValues: {
@@ -108,10 +111,12 @@ export function SecondStep(nextStep:any){
  
   // 2. Define a submit handler.
   function onSubmit2(values: z.infer<typeof formSecondrSchema>) {
-    nextStep.nextStep();
+    nextStep()
   }
   return(
-    <div className="ml-[450px] mt-[350px]">
+    <div>
+      <Button  className="ml-[1000px] mt-5" onClick={changeSign}>Login</Button><div className="ml-[450px] mt-[350px]">
+     
       <div className="font-extrabold">Create Your Account
         <p className="text-gray-500 font-medium">Choose a username for your page</p>
       </div>
@@ -124,7 +129,7 @@ export function SecondStep(nextStep:any){
             <FormItem>
               <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input placeholder="shadcn" {...field} />
+                <Input className="w-[359px]" placeholder="Enter username here" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -134,10 +139,12 @@ export function SecondStep(nextStep:any){
         <Button type="submit">Contiune</Button>
       </form>
        </Form>
-    </div>
+    </div></div>
+    
   )
 }
-export function ThirdStep({backStep,nextStep}:any){
+export function ThirdStep({ changeSign1,backStep,nextStep}:any){
+  console.log( typeof backStep)
   const form3 = useForm<z.infer<typeof formThirdSchema>>({
     resolver: zodResolver(formThirdSchema),
     defaultValues: {
@@ -157,7 +164,9 @@ export function ThirdStep({backStep,nextStep}:any){
    ////////
   }
   return(
-    <div className="ml-[450px] mt-[350px]">
+    <div> 
+      <Button  className="ml-[1000px] mt-5" onClick={changeSign1}>Login</Button>  
+       <div className="ml-[450px] mt-[350px]">
       <div className="font-extrabold">Welcome
         <p className="text-gray-500 font-medium">Connect email and set a password</p>
       </div>
@@ -170,7 +179,7 @@ export function ThirdStep({backStep,nextStep}:any){
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="shadcn" {...field} />
+                <Input className="w-[359px]" placeholder="Enter email here" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -182,17 +191,18 @@ export function ThirdStep({backStep,nextStep}:any){
           <FormItem>
             <FormLabel>Password</FormLabel>
             <FormControl>
-              <Input placeholder="shadcn" {...field} />
+              <Input className="w-[359px]" type="password" placeholder="Enter password here" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
         )}
       />
-      <Button onClick={backStep.backStep} >back</Button>
-        <Button onClick={nextStep.nextStep}  type="submit">next</Button>
+      <Button onClick={backStep} >back</Button>
+        <Button className="ml-[20px]" onClick={nextStep.nextStep}  type="submit">next</Button>
       </form>
        </Form>
-    </div>
+    </div></div>
+   
   )
 }
 
