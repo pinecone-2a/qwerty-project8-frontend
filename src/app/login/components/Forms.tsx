@@ -3,7 +3,14 @@ import * as React from "react"
  import { Label } from "@/components/ui/label"
  import { z } from "zod"
 import { Button } from "@/components/ui/button"
-
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,12 +46,14 @@ const formThirdSchema = z.object({
       path: ['confirmPassword'],
     })
   }
+  password: z.string().min(8).max(50)
 });
 const formFirstSchema = z.object({
  
   email: z.string().email(),
   password: z.string().min(8).max(50)
 });
+
 // const ConfirmPasswordSchema = z.object({
  
 //   email: z.string().email(),
@@ -208,7 +217,6 @@ export function ThirdStep({ changeSign1,backStep,nextStep}:any){
           </FormItem>
         )}
       />
-      
       <Button onClick={backStep} >back</Button>
         <Button className="ml-[20px]" onClick={nextStep.nextStep}  type="submit">next</Button>
       </form>
