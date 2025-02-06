@@ -3,21 +3,21 @@ import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { CameraIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { validateProfileFirst } from "./validate1";
 
 interface FormData {
   name: string;
   about: string;
   socialmedia: string;
-  image: string | null;
-  firstname?: string;
-  lastname?: string;
-  card?: string;
-  country?: string;
-  month?: string;
-  year?: string;
-  CVC?: string;
+  image: string;
+  firstname: string;
+  lastname: string;
+  card: string;
+  country: string;
+  month: string;
+  year: string;
+  CVC: string;
 }
-
 interface ProfileFirstProps {
   form: FormData;
   setForm: React.Dispatch<React.SetStateAction<FormData>>;
@@ -28,10 +28,14 @@ export function ProfileFirst({
   form,
   setForm,
   setCurrentStep,
+  errors,
+  setErrors,
 }: {
   form: FormData;
   setForm: any;
   setCurrentStep: any;
+  errors: any;
+  setErrors: any;
 }) {
   const [image, setImage] = useState<string | null>(form.image || "");
 
@@ -57,12 +61,32 @@ export function ProfileFirst({
     setForm((prev: any) => ({ ...prev, [name]: value }));
   };
 
+  const handleContinue = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault(); // Prevent form submission
+
+    // Validate the form
+    const { isValid, newErrors } = validateProfileFirst(form);
+
+    // Log errors for debugging
+    console.log("Errors:", newErrors);
+
+    // Update errors state
+    setErrors(newErrors);
+
+    // Log form and errors after update
+    console.log("Updated Form:", form);
+    console.log("Updated Errors:", newErrors);
+
+    if (isValid) {
+      setCurrentStep(2); // Move to the next step if valid
+    }
+  };
+
   return (
     <>
       <div className="flex flex-col items-center justify-start mt-[100px]">
         <div className="grid w-full max-w-sm items-center gap-1.5">
           <p className="pb-4">Complete your profile page</p>
-
           <Label htmlFor="picture">Add photo</Label>
           <div
             style={{
@@ -71,10 +95,9 @@ export function ProfileFirst({
               alignItems: "center",
               gap: "10px",
               justifyContent: "center",
-              position: "relative", // to position the camera icon inside the circle if no image is selected
+              position: "relative",
             }}
           >
-            {/* Circle for image preview or camera icon */}
             <div
               style={{
                 width: "160px",
@@ -85,7 +108,7 @@ export function ProfileFirst({
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                backgroundColor: form.image ? "transparent" : "white", // If no image, background is white; otherwise transparent
+                backgroundColor: form.image ? "transparent" : "white",
               }}
             >
               {form.image ? (
@@ -118,14 +141,15 @@ export function ProfileFirst({
                 width: "160px",
                 height: "160px",
                 borderRadius: "50%",
-                position: "absolute", // Positioning the label over the circular container
-                top: "0",
+                position: "absolute",
                 left: "0",
                 cursor: "pointer",
               }}
             />
+            {errors.image && (
+              <div className="error text-red-500 text-xs">{errors.image}</div>
+            )}
           </div>
-
           <Label htmlFor="name" className="pt-4">
             Name
           </Label>
@@ -137,6 +161,9 @@ export function ProfileFirst({
             onChange={handleChange}
             placeholder="Enter your name"
           />
+          {errors.name && (
+            <div className="error text-red-500 text-xs">{errors.name}</div>
+          )}
 
           <Label htmlFor="about" className="pt-4">
             About
@@ -149,6 +176,9 @@ export function ProfileFirst({
             onChange={handleChange}
             placeholder="Write about yourself here"
           />
+          {errors.about && (
+            <div className="error text-red-500 text-xs">{errors.about}</div>
+          )}
 
           <Label htmlFor="socialmedia" className="pt-4">
             Social media
@@ -161,9 +191,15 @@ export function ProfileFirst({
             onChange={handleChange}
             placeholder="https://"
           />
+          {errors.socialmedia && (
+            <div className="error text-red-500 text-xs">
+              {errors.socialmedia}
+            </div>
+          )}
+
           <button
-            onClick={() => setCurrentStep(2)}
-            className="bg-[rgba(24,24,27,0.2)] rounded-md text-white h-[35px]"
+            className="bg-[rgba(24,24,27,0.2)] rounded-md text-white h-[35px] hover:bg-black hover:text-white"
+            onClick={handleContinue}
           >
             Continue
           </button>

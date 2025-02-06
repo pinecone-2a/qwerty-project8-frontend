@@ -2,18 +2,20 @@
 import { useState } from "react";
 import { ProfileFirst } from "./component/Step1";
 import { ProfileNext } from "./component/Step2";
+import { ProfileConfirmation } from "./component/Step3";
+
 interface FormData {
   name: string;
   about: string;
   socialmedia: string;
-  image: string | null;
-  firstname?: string;
-  lastname?: string;
-  card?: string;
-  country?: string;
-  month?: string;
-  year?: string;
-  CVC?: string;
+  image: string;
+  firstname: string;
+  lastname: string;
+  card: string;
+  country: string;
+  month: string;
+  year: string;
+  CVC: string;
 }
 
 export default function Home() {
@@ -27,7 +29,11 @@ export default function Home() {
     lastname: "",
     card: "",
     country: "",
+    month: "",
+    year: "",
+    CVC: "",
   });
+  const [errors, setErrors] = useState<any>({});
 
   return (
     <>
@@ -36,6 +42,8 @@ export default function Home() {
           form={form}
           setForm={setForm}
           setCurrentStep={setCurrentStep}
+          errors={errors} // Pass errors as props
+          setErrors={setErrors} // Pass setErrors as props
         />
       )}
       {currentStep === 2 && (
@@ -43,6 +51,17 @@ export default function Home() {
           form={form}
           setForm={setForm}
           setCurrentStep={setCurrentStep}
+          errors={errors} // Pass errors as props
+          setErrors={setErrors} // Pass setErrors as props
+        />
+      )}
+      {currentStep === 3 && (
+        <ProfileConfirmation
+          form={form}
+          setForm={setForm}
+          setCurrentStep={setCurrentStep}
+          errors={errors} // Pass errors as props
+          setErrors={setErrors} // Pass setErrors as props
         />
       )}
     </>

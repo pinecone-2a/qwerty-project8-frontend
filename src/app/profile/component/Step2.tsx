@@ -13,19 +13,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { validateProfileNext } from "./validate2";
 
 interface FormData {
   name: string;
   about: string;
   socialmedia: string;
-  image: string | null;
-  firstname?: string;
-  lastname?: string;
-  card?: string;
-  country?: string;
-  month?: string;
-  year?: string;
-  CVC?: string;
+  image: string;
+  firstname: string;
+  lastname: string;
+  card: string;
+  country: string;
+  month: string;
+  year: string;
+  CVC: string;
 }
 
 interface ProfileNextProps {
@@ -38,29 +39,15 @@ export function ProfileNext({
   form,
   setForm,
   setCurrentStep,
+  errors,
+  setErrors,
 }: {
   form: FormData;
   setForm: any;
   setCurrentStep: any;
+  errors: any;
+  setErrors: any;
 }) {
-  //   const [profile, setProfile] = useState<{
-  //     country: string;
-  //     firstname: string;
-  //     lastname: string;
-  //     card: string;
-  //     month: string;
-  //     year: string;
-  //     CVC: string;
-  //   }>({
-  //     country: "",
-  //     firstname: "",
-  //     lastname: "",
-  //     card: "",
-  //     month: "",
-  //     year: "",
-  //     CVC: "",
-  //   });a
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((prev: any) => ({ ...prev, [name]: value }));
@@ -94,25 +81,27 @@ export function ProfileNext({
     }
     setForm((prev: any) => ({ ...prev, CVC: value })); // Update state
   };
-  const submitModal = async () => {
-    try {
-      const response = await fetch("/api/submit", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form), // Send the profile data
-      });
-      if (response.ok) {
-        alert("Profile is created successfully!"); // Show success prompt
-        setCurrentStep(3); // Optionally, navigate to step 3
-      } else {
-        console.error("Failed to submit");
-      }
-    } catch (error) {
-      console.error("Error submitting form:", error);
+  const handleContinue = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault(); // Prevent form submission
+
+    // Validate the form
+    const { isValid, newErrors } = validateProfileNext(form);
+
+    // Log errors for debugging
+    console.log("Errors:", newErrors);
+
+    // Update errors state
+    setErrors(newErrors);
+
+    // Log form and errors after update
+    console.log("Updated Form:", form);
+    console.log("Updated Errors:", newErrors);
+
+    if (isValid) {
+      setCurrentStep(3); // Move to the next step if valid
     }
   };
+
   return (
     <>
       <div className="flex flex-col items-center justify-start mt-[100px]">
@@ -137,6 +126,9 @@ export function ProfileNext({
               </SelectGroup>
             </SelectContent>
           </Select>
+          {errors.country && (
+            <div className="error text-red-500 text-xs">{errors.country}</div>
+          )}
           <div className="flex gap-2 flex-col sm:flex-row">
             <div className="flex-col sm:w-1/2 w-full">
               <Label htmlFor="firstname" className="pt-4">
@@ -150,6 +142,11 @@ export function ProfileNext({
                 onChange={handleChange}
                 placeholder="Enter your first name here"
               />
+              {errors.firstname && (
+                <div className="error text-red-500 text-xs">
+                  {errors.firstname}
+                </div>
+              )}
             </div>
             <div className="flex-col sm:w-1/2 w-full">
               <Label htmlFor="lastname" className="pt-4">
@@ -163,6 +160,11 @@ export function ProfileNext({
                 onChange={handleChange}
                 placeholder="Enter your last name here"
               />
+              {errors.lastname && (
+                <div className="error text-red-500 text-xs">
+                  {errors.lastname}
+                </div>
+              )}
             </div>
           </div>
           <Label htmlFor="card" className="pt-4">
@@ -174,6 +176,9 @@ export function ProfileNext({
             placeholder="XXXX-XXXX-XXXX-XXXX"
             maxLength={19}
           />
+          {errors.card && (
+            <div className="error text-red-500 text-xs">{errors.card}</div>
+          )}
           <div className="flex gap-2">
             <div className="flex-col w-1/3">
               <Label htmlFor="month" className="pt-4">
@@ -201,6 +206,9 @@ export function ProfileNext({
                   </SelectGroup>
                 </SelectContent>
               </Select>
+              {errors.month && (
+                <div className="error text-red-500 text-xs">{errors.month}</div>
+              )}
             </div>
             <div className="flex-col w-1/3">
               <Label htmlFor="year" className="pt-4">
@@ -222,6 +230,9 @@ export function ProfileNext({
                   </SelectGroup>
                 </SelectContent>
               </Select>
+              {errors.year && (
+                <div className="error text-red-500 text-xs">{errors.year}</div>
+              )}
             </div>
             <div className="flex-col w-1/3 pb-4">
               <Label htmlFor="CVC" className="pt-4">
@@ -235,11 +246,14 @@ export function ProfileNext({
                 onChange={handleCVCChange}
                 placeholder="CVC"
               />
+              {errors.CVC && (
+                <div className="error text-red-500 text-xs">{errors.CVC}</div>
+              )}
             </div>
           </div>
           <button
-            onClick={submitModal}
-            className="bg-[rgba(24,24,27,0.2)] rounded-md text-white h-[35px]"
+            className="bg-[rgba(24,24,27,0.2)] rounded-md text-white h-[35px] hover:bg-black hover:text-white"
+            onClick={handleContinue}
           >
             Continue
           </button>
