@@ -33,6 +33,19 @@ const formSecondrSchema = z.object({
 const formThirdSchema = z.object({
  
   email: z.string().email(),
+  password: z.string().min(8).max(50),
+  confirmPassword: z
+  .string()
+  .min(1, { message: 'Please confirm your password' })
+  
+}).superRefine((val, ctx) => {
+  if (val.password !== val.confirmPassword) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Password is not the same as confirm password',
+      path: ['confirmPassword'],
+    })
+  }
   password: z.string().min(8).max(50)
 });
 const formFirstSchema = z.object({
@@ -40,6 +53,12 @@ const formFirstSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8).max(50)
 });
+
+// const ConfirmPasswordSchema = z.object({
+ 
+//   email: z.string().email(),
+//   password: z.string().min(8).max(50)
+// });
 export function SignUp(nextStep:any){
   const form1 = useForm<z.infer<typeof formFirstSchema>>({
     resolver: zodResolver(formFirstSchema),
@@ -144,7 +163,7 @@ export function SecondStep({ changeSign,nextStep}:any){
   )
 }
 export function ThirdStep({ changeSign1,backStep,nextStep}:any){
-  console.log( typeof backStep)
+  console.log( typeof nextStep)
   const form3 = useForm<z.infer<typeof formThirdSchema>>({
     resolver: zodResolver(formThirdSchema),
     defaultValues: {
@@ -159,6 +178,7 @@ export function ThirdStep({ changeSign1,backStep,nextStep}:any){
   // 2. Define a submit handler.
   function onSubmit3(values: z.infer<typeof formThirdSchema>) {
    ///////////////
+   changeSign1()
 
 //daraaan yaah function
    ////////
