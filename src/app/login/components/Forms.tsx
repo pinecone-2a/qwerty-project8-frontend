@@ -3,14 +3,7 @@ import * as React from "react"
  import { Label } from "@/components/ui/label"
  import { z } from "zod"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+
 import { Input } from "@/components/ui/input"
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,13 +26,30 @@ const formSecondrSchema = z.object({
 const formThirdSchema = z.object({
  
   email: z.string().email(),
-  password: z.string().min(8).max(50)
+  password: z.string().min(8).max(50),
+  confirmPassword: z
+  .string()
+  .min(1, { message: 'Please confirm your password' })
+  
+}).superRefine((val, ctx) => {
+  if (val.password !== val.confirmPassword) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Password is not the same as confirm password',
+      path: ['confirmPassword'],
+    })
+  }
 });
 const formFirstSchema = z.object({
  
   email: z.string().email(),
   password: z.string().min(8).max(50)
 });
+// const ConfirmPasswordSchema = z.object({
+ 
+//   email: z.string().email(),
+//   password: z.string().min(8).max(50)
+// });
 export function SignUp(nextStep:any){
   const form1 = useForm<z.infer<typeof formFirstSchema>>({
     resolver: zodResolver(formFirstSchema),
@@ -144,7 +154,7 @@ export function SecondStep({ changeSign,nextStep}:any){
   )
 }
 export function ThirdStep({ changeSign1,backStep,nextStep}:any){
-  console.log( typeof backStep)
+  console.log( typeof nextStep)
   const form3 = useForm<z.infer<typeof formThirdSchema>>({
     resolver: zodResolver(formThirdSchema),
     defaultValues: {
@@ -159,6 +169,7 @@ export function ThirdStep({ changeSign1,backStep,nextStep}:any){
   // 2. Define a submit handler.
   function onSubmit3(values: z.infer<typeof formThirdSchema>) {
    ///////////////
+   changeSign1()
 
 //daraaan yaah function
    ////////
@@ -197,6 +208,7 @@ export function ThirdStep({ changeSign1,backStep,nextStep}:any){
           </FormItem>
         )}
       />
+      
       <Button onClick={backStep} >back</Button>
         <Button className="ml-[20px]" onClick={nextStep.nextStep}  type="submit">next</Button>
       </form>
