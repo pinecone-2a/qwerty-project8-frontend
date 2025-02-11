@@ -11,9 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ChevronDown } from "lucide-react";
-import Link from "next/link";
-import { GrShare } from "react-icons/gr";
-import Navigation from "../_components/Navigation";
+import { FiCoffee } from "react-icons/fi";
 
 interface Transaction {
   name: string;
@@ -67,28 +65,43 @@ export default function Dashboard() {
     : transactions;
 
   return (
-    <div className="min-h-screen text-white p-6">
-      <div className="flex flex-col w-60 h-9 mt-4 ml-14">
-        <Link
-          href="/dashboard/home-page"
-          className="w-60 h-9 bg-[#f4f4f5] mt-1 font-medium text-black shadow-none hover:bg-[#f4f4f5]"
-        >
-          <Button className="bg-[#f4f4f5] w-60 font-medium text-black shadow-none hover:bg-[#f4f4f5] focus:bg-[#f4f4f5]">
-            {" "}
-            Home
-          </Button>
-        </Link>
-        <Button className="bg-white mt-1 text-black shadow-none hover:bg-[#f4f4f5] focus:bg-[#f4f4f5]">
-          Explore
-        </Button>
-        <Button className="bg-white mt-1 text-black shadow-none hover:bg-[#f4f4f5] focus:bg-[#f4f4f5]">
-          View page <GrShare />{" "}
-        </Button>
-        <Button className="bg-white mt-1 text-black shadow-none hover:bg-[#f4f4f5] focus:bg-[#f4f4f5]">
-          Account settings
-        </Button>
-      </div>
-      <div className="max-w-2xl mx-auto -mt-16">
+    <div className="flex min-h-screen text-white">
+      <aside className="w-64 h-screen p-6 ">
+        <h1 className="text-xl font-bold mb-6 text-black flex gap-3">
+          <FiCoffee size={28} /> Buy Me Coffee
+        </h1>
+        <nav>
+          <ul>
+            <li className="mb-4">
+              <a
+                href="/dashboard/home-page"
+                className="text-gray-700 font-bold"
+              >
+                Home
+              </a>
+            </li>
+            <li className="mb-4">
+              <a
+                href="/dashboard/explore"
+                className="text-gray-700 hover:text-black"
+              >
+                Explore
+              </a>
+            </li>
+            <li className="mb-4">
+              <a href="#" className="text-gray-700 hover:text-black">
+                View page ↗
+              </a>
+            </li>
+            <li>
+              <a href="#" className="text-gray-700 hover:text-black">
+                Account settings
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+      <main className="max-w-2xl ml-[550px]">
         <Card className=" p-6 rounded-lg shadow-lg w-[907px]">
           <div className="mt-4 flex justify-between items-center">
             <div>
@@ -168,7 +181,7 @@ export default function Dashboard() {
             ))}
           </div>
         </Card>
-      </div>
+      </main>
     </div>
   );
 }

@@ -1,8 +1,4 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import Navigation from "./_components/Navigation";
-import { GrShare } from "react-icons/gr";
-
+import { FiCoffee } from "react-icons/fi";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
@@ -32,27 +28,41 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="flex flex-col w-60 h-9 mt-4 ml-14">
-          <Navigation />
-          <Link
-            href="/dashboard/home-page"
-            className="w-60 h-9 bg-[#f4f4f5] mt-1 font-medium text-black shadow-none hover:bg-[#f4f4f5]"
-          >
-            <Button className="bg-[#f4f4f5] w-60 font-medium text-black shadow-none hover:bg-[#f4f4f5] focus:bg-[#f4f4f5]">
-              {" "}
-              Home
-            </Button>
-          </Link>
-          <Button className="bg-white mt-1 text-black shadow-none hover:bg-[#f4f4f5] focus:bg-[#f4f4f5]">
-            Explore
-          </Button>
-          <Button className="bg-white mt-1 text-black shadow-none hover:bg-[#f4f4f5] focus:bg-[#f4f4f5]">
-            View page <GrShare />{" "}
-          </Button>
-          <Button className="bg-white mt-1 text-black shadow-none hover:bg-[#f4f4f5] focus:bg-[#f4f4f5]">
-            Account settings
-          </Button>
-        </div>
+        <aside className="w-64 h-screen p-6">
+          <h1 className="text-xl font-bold mb-6 text-black flex gap-3">
+            <FiCoffee size={28} /> Buy Me Coffee
+          </h1>
+          <nav>
+            <ul>
+              <li className="mb-4">
+                <a
+                  href="/dashboard/home-page"
+                  className="text-gray-700 hover:text-black"
+                >
+                  Home
+                </a>
+              </li>
+              <li className="mb-4">
+                <a
+                  href="dashboard/explore"
+                  className="text-gray-700 hover:text-black"
+                >
+                  Explore
+                </a>
+              </li>
+              <li className="mb-4">
+                <a href="#" className="text-gray-700 hover:text-black">
+                  View page ↗
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-700 hover:text-black">
+                  Account settings
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </aside>
         {children}
       </body>
     </html>
