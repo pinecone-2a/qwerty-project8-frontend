@@ -1,6 +1,6 @@
 'use client'
 import { useState } from "react";
-import Bottom from "../../../components/b-arrow";
+import Bottom from "../../../../components/b-arrow";
 
 export default function Header() {
     const [profile, setProfile] = useState<{
@@ -29,7 +29,7 @@ export default function Header() {
                                     borderRadius: "50%",
                                   }}
                                 ></div>
-                                <p className="text-black">Jake</p>
+                                <p className="text-black">{profile.name}</p>
                                 <Bottom />
                               </div>
                             </header>

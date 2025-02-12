@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { z } from "zod";
 
@@ -12,15 +12,16 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
-import Coffee from "../../../components/Coffee";
-import Heart from "../../../components/Heart";
+import Heart from "../../../../components/Heart";
+import Coffee from "../../../../components/Coffee";
 
 export default function Donation() {
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [url, setUrl] = useState("");
   const [message, setMessage] = useState("");
 
-  const isFormComplete = selectedAmount !== null && url.trim() !== "" && message.trim() !== "";
+  const isFormComplete =
+    selectedAmount !== null && url.trim() !== "" && message.trim() !== "";
 
   const [cover, setCover] = useState<{
     image: string | null;
@@ -45,6 +46,8 @@ export default function Donation() {
     socialmedia: "",
   });
 
+  const [name, setName] = useState("");
+
   const CancelProfile = () => {
     setProfile((prev) => ({ ...prev, image: null }));
   };
@@ -65,6 +68,19 @@ export default function Donation() {
       setProfile((prev) => ({ ...prev, image: dataJson.secure_url }));
     }
   };
+  const patchName = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      const file = event.target.files[0];
+      const data = new FormData();
+      data.append("file", file);
+      data.append("upload_preset", "buy_me_coffee");
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/profile`,
+        { method: "PATCH", body: data }
+      );
+    }
+  };
   const onClick = () => {};
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,6 +88,29 @@ export default function Donation() {
     setCover((prev) => ({ ...prev, [name]: value }));
   };
 
+  const fetchProfile = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/profile`
+      );
+      if (!response.ok) throw new Error("Failed to fetch profile");
+
+      const data = await response.json();
+
+      // Ensure 'name' exists in response data
+      if (data?.name) {
+        setName(data.name);
+      } else {
+        console.warn("Profile data does not contain 'name'");
+      }
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
 
   return (
     <div className="flex justify-center">
@@ -89,7 +128,7 @@ export default function Donation() {
                 }}
               ></div>
               <p className="text-black font-[700] text-[20px] leading-[20px]">
-                Jake
+                {name}
               </p>
             </div>
             <Dialog>
@@ -125,6 +164,8 @@ export default function Donation() {
                   <p>Name</p>
                   <input
                     type="text"
+                    value={name || ""} // Ensure it doesn't become undefined
+                    onChange={(e) => setName(e.target.value)}
                     className="w-[460px] h-[40px] border-[1px] rounded-md p-3"
                   />
                 </div>
@@ -152,7 +193,7 @@ export default function Donation() {
           </div>
           <div className="w-full h-[1px] border-[1px] mt-6"></div>
           <div className="mt-6">
-            <p className="font-[600] text-[16px] leading-[24px]">About Jake</p>
+            <p className="font-[600] text-[16px] leading-[24px]">About {name}</p>
             <p className="mt-3">
               I'm a typical person who enjoys exploring different things. I also
               make music art a hobby. Follow me along.
@@ -175,51 +216,57 @@ export default function Donation() {
         </div>
       </div>
       <div className="flex justify-center">
-      <div className="w-[628px] h-[509px] bg-[#FFFFFF] border-[1px] rounded-lg relative top-[-60px] p-7">
-        <p className="font-[600] text-[24px]">Buy Jake a Coffee</p>
-        <p className="mt-5">Select Amount:</p>
-        <div className="flex gap-[8px]">
-          {[1, 2, 5, 10].map((amount) => (
-            <button
-              key={amount}
-              className={`w-[72px] h-[40px] rounded-md flex items-center justify-center gap-2 border-2 ${
-                selectedAmount === amount ? "border-black" : "border-[#E4E4E7]"
-              }`}
-              onClick={() => setSelectedAmount(amount)}
-            >
-              <Coffee />
-              <p className="font-[500] text-[14px]">${amount}</p>
-            </button>
-          ))}
+        <div className="w-[628px] h-[509px] bg-[#FFFFFF] border-[1px] rounded-lg relative top-[-60px] p-7">
+          <p className="font-[600] text-[24px]">Buy Jake a Coffee</p>
+          <p className="mt-5">Select Amount:</p>
+          <div className="flex gap-[8px]">
+            {[1, 2, 5, 10].map((amount) => (
+              <button
+                key={amount}
+                className={`w-[72px] h-[40px] rounded-md flex items-center justify-center gap-2 border-2 ${
+                  selectedAmount === amount
+                    ? "border-black"
+                    : "border-[#E4E4E7]"
+                }`}
+                onClick={() => setSelectedAmount(amount)}
+              >
+                <Coffee />
+                <p className="font-[500] text-[14px]">${amount}</p>
+              </button>
+            ))}
+          </div>
+          <div>
+            <p className="font-[500] mt-5 mb-2">
+              Enter BuyMeCoffee or social account URL:
+            </p>
+            <input
+              type="text"
+              placeholder="buymeacoffee.com"
+              className="border-[1px] w-[580px] h-[40px] p-5 rounded-md outline-none"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+            />
+          </div>
+          <div>
+            <p className="font-[500] mt-5 mb-2">Special Message:</p>
+            <Textarea
+              placeholder="Please write your message here"
+              value={message || ""} // Prevent undefined
+              onChange={(e) => setMessage(e.target.value)}
+            />
+          </div>
+          <button
+            className={`w-[580px] h-[40px] rounded-md mt-6 flex items-center justify-center ${
+              isFormComplete
+                ? "bg-[#18181B] text-white"
+                : "bg-[#cbcbcb] text-[#FAFAFA]"
+            }`}
+            disabled={!isFormComplete}
+          >
+            Support
+          </button>
         </div>
-        <div>
-          <p className="font-[500] mt-5 mb-2">Enter BuyMeCoffee or social account URL:</p>
-          <input
-            type="text"
-            placeholder="buymeacoffee.com"
-            className="border-[1px] w-[580px] h-[40px] p-5 rounded-md outline-none"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-          />
-        </div>
-        <div>
-          <p className="font-[500] mt-5 mb-2">Special Message:</p>
-          <Textarea
-            placeholder="Please write your message here"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-          />
-        </div>
-        <button
-          className={`w-[580px] h-[40px] rounded-md mt-6 flex items-center justify-center ${
-            isFormComplete ? "bg-[#18181B] text-white" : "bg-[#cbcbcb] text-[#FAFAFA]"
-          }`}
-          disabled={!isFormComplete}
-        >
-          Support
-        </button>
       </div>
-    </div>
     </div>
   );
 }
