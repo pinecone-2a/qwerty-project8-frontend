@@ -42,10 +42,7 @@ const ExploreCreators: React.FC = () => {
         <nav>
           <ul>
             <li className="mb-4">
-              <a
-                href="/dashboard/home-page"
-                className="text-gray-700 hover:text-black"
-              >
+              <a href="/dashboard" className="text-gray-700 hover:text-black">
                 Home
               </a>
             </li>
