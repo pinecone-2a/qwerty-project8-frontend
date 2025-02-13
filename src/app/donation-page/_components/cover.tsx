@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { useEffect } from 'react'
 import Camera from '../../../../components/Camera';
 
 export default function Cover() {
@@ -72,13 +73,36 @@ export default function Cover() {
             );
           }
         };
+        const handleCover = async (event: React.ChangeEvent<HTMLInputElement>) => {
+          if (event.target.files && event.target.files.length > 0) {
+            const file = event.target.files[0];
+            const data = new FormData();
+            data.append("file", file);
+            data.append("upload_preset", "buy_me_coffee");
+            const response = await fetch(
+              `https://api.cloudinary.com/v1_1/dabc04pmm/upload`,
+              { method: "POST", body: data }
+            );
+            const dataJson = await response.json();
+            setCover(dataJson.secure_url);
+      
+          }
+        };
+        useEffect(() => {
+            async function fetchCover() {
+              const response = await fetch("http://localhost:8000/profile/1");
+              const data = await response.json();
+              setCover(data[0].backgroundImage);
+            }
+            fetchCover();
+          }, []);
     return (
         <div
         className={`flex flex-col w-full h-[319px] bg-[#F4F4F5] ${
           !cover.image && " justify-center items-center "
         }`}
         style={{
-          backgroundImage: `url(${cover.image})`,
+          backgroundImage: `url(${cover})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
@@ -88,7 +112,7 @@ export default function Cover() {
           id="file-upload"
           type="file"
           className="hidden"
-          onChange={handleUpload}
+          onChange={handleCover}
         />
       </div>
     )

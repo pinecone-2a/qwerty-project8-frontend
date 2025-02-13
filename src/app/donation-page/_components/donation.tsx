@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
-import { z } from "zod";
+import { set, z } from "zod";
 
 import {
   Dialog,
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import Heart from "../../../../components/Heart";
 import Coffee from "../../../../components/Coffee";
+import e from "cors";
 
 export default function Donation() {
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
@@ -23,34 +24,12 @@ export default function Donation() {
   const isFormComplete =
     selectedAmount !== null && url.trim() !== "" && message.trim() !== "";
 
-  const [cover, setCover] = useState<{
-    image: string | null;
-    name: string;
-    about: string;
-    socialmedia: string;
-  }>({
-    image: null,
-    name: "",
-    about: "",
-    socialmedia: "",
-  });
-  const [profile, setProfile] = useState<{
-    image: string | null;
-    name: string;
-    about: string;
-    socialmedia: string;
-  }>({
-    image: null,
-    name: "",
-    about: "",
-    socialmedia: "",
-  });
-
+  const [cover, setCover] = useState("")
+  const [profile, setProfile] = useState("")
   const [name, setName] = useState("");
+  const [about, setAbout] = useState("");
+  const [socialmedia, setSocialmedia] = useState("https://");
 
-  const CancelProfile = () => {
-    setProfile((prev) => ({ ...prev, image: null }));
-  };
 
   const handleProfile = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -64,51 +43,35 @@ export default function Donation() {
         { method: "POST", body: data }
       );
       const dataJson = await response.json();
+      setProfile(dataJson.secure_url);
 
-      setProfile((prev) => ({ ...prev, image: dataJson.secure_url }));
     }
   };
-  const patchName = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 0) {
-      const file = event.target.files[0];
-      const data = new FormData();
-      data.append("file", file);
-      data.append("upload_preset", "buy_me_coffee");
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/profile`,
-        { method: "PATCH", body: data }
-      );
-    }
-  };
-  const onClick = () => {};
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setCover((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const fetchProfile = async () => {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/profile`
-      );
-      if (!response.ok) throw new Error("Failed to fetch profile");
-
-      const data = await response.json();
-
-      // Ensure 'name' exists in response data
-      if (data?.name) {
-        setName(data.name);
-      } else {
-        console.warn("Profile data does not contain 'name'");
-      }
-    } catch (error) {
-      console.error("Error fetching profile:", error);
-    }
-  };
+  async function editProfile() {
+    await fetch("http://localhost:8000/profile/1", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: name,
+        about: about,
+        avatarImage: profile,
+        socialMediaURL:socialmedia,
+      }),
+    });
+  
+  }
 
   useEffect(() => {
+    async function fetchProfile() {
+      const response = await fetch("http://localhost:8000/profile/1");
+      const data = await response.json();
+      setProfile(data[0].avatarImage);
+      setName(data[0].name);
+      setAbout(data[0].about);
+      setSocialmedia(data[0].socialMediaURL);
+    }
     fetchProfile();
   }, []);
 
@@ -121,7 +84,7 @@ export default function Donation() {
               <div
                 className="w-[40px] h-[40px]"
                 style={{
-                  backgroundImage: `url(${profile.image})`,
+                  backgroundImage: `url(${profile})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                   borderRadius: "50%",
@@ -144,65 +107,78 @@ export default function Donation() {
                   </DialogDescription>
                 </DialogHeader>
                 <p>Add Photo</p>
-                <label
-                  htmlFor="profile-upload"
-                  className="cursor-pointer w-[160px] h-[160px] bg-[#F4F4F5] rounded-lg flex items-center justify-center"
-                  style={{
-                    backgroundImage: `url(${profile.image})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    borderRadius: "50%",
-                  }}
-                ></label>
-                <input
-                  id="profile-upload"
-                  type="file"
-                  className="hidden"
-                  onChange={handleProfile}
-                />
-                <div className="mt-10">
-                  <p>Name</p>
+                <form action={editProfile}>
+                  <label
+                    htmlFor="profile-upload"
+                    className="cursor-pointer w-[160px] h-[160px] bg-[#F4F4F5] rounded-lg flex items-center justify-center"
+                    style={{
+                      backgroundImage: `url(${profile})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      borderRadius: "50%",
+                    }}
+                  ></label>
                   <input
-                    type="text"
-                    value={name || ""} // Ensure it doesn't become undefined
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-[460px] h-[40px] border-[1px] rounded-md p-3"
+                    name="profile-upload"
+                    id="profile-upload"
+                    type="file"
+                    className="hidden"
+                    onChange={handleProfile}
                   />
-                </div>
-                <p className="mb-[-15px]">About</p>
-                <Textarea />
-                <p className="mb-[-15px]">Social Media URL</p>
-                <input
-                  type="text"
-                  className="w-[460px] h-[40px] border-[1px] rounded-md p-3"
-                />
-
-                <div className="flex gap-2 justify-end">
-                  <DialogClose
-                    onClick={CancelProfile}
-                    className="w-[79px] h-[40px] bg-[#F4F4F5] rounded-md flex justify-center items-center"
-                  >
-                    Cancel
-                  </DialogClose>
-                  <DialogClose className="w-[126px] h-[40px] bg-[#18181B] text-[white] rounded-md flex justify-center items-center">
-                    Save Changes
-                  </DialogClose>
-                </div>
+                  <div className="mt-10">
+                    <p>Name</p>
+                    <input
+                      name="name"
+                      type="text"
+                      defaultValue={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-[460px] h-[40px] border-[1px] rounded-md p-3"
+                    />
+                  </div>
+                  <p className="mb-[5px] mt-[5px]">About</p>
+                  <Textarea name="about" defaultValue={about} onChange={(e) => setAbout(e.target.value)}/>
+                  <p className="mb-[5px] mt-[5px]">Social Media URL</p>
+                  <input
+                    name="socialmedia"
+                    type="text"
+                    className="w-[460px] h-[40px] border-[1px] rounded-md p-3"
+                    defaultValue={socialmedia}
+                    onChange={(e) => setSocialmedia(e.target.value)}
+                  />
+                  <div className="flex gap-2 justify-end mt-[30px]">
+                    <DialogClose
+                      className="w-[79px] h-[40px] bg-[#F4F4F5] rounded-md flex justify-center items-center"
+                    >
+                      Cancel
+                    </DialogClose>
+                    <DialogClose
+                      onClick={(e) => {
+                        const form = e.currentTarget.closest("form"); // Find the nearest form
+                        if (form) {
+                          const formData = new FormData(form);
+                          editProfile();
+                        }
+                      }}
+                      className="w-[126px] h-[40px] bg-[#18181B] text-[white] rounded-md flex justify-center items-center"
+                    >
+                      Save Changes
+                    </DialogClose>
+                  </div>
+                </form>
               </DialogContent>
             </Dialog>
           </div>
           <div className="w-full h-[1px] border-[1px] mt-6"></div>
           <div className="mt-6">
-            <p className="font-[600] text-[16px] leading-[24px]">About {name}</p>
-            <p className="mt-3">
-              I'm a typical person who enjoys exploring different things. I also
-              make music art a hobby. Follow me along.
+            <p className="font-[600] text-[16px] leading-[24px]">
+              About {name}
             </p>
+            <p className="mt-3">{about}</p>
           </div>
         </div>
         <div className="w-[632px] h-[116px] border-[1px] border-[#E4E4E7] rounded-lg m-5 p-5 bg-[#FFFFFF]">
           <p className="font-[600] text-[16px]">Social Media URL</p>
-          <p className="mt-3">https://buymeacoffee.com/spacerulz44</p>
+          <p className="mt-3">{socialmedia}</p>
         </div>
         <div className="w-[632px] h-[236px] border-[1px] border-[#E4E4E7] rounded-lg m-5 p-5 bg-[#FFFFFF]">
           <p className="font-[600] text-[16px]">Recent Supporters</p>
@@ -217,7 +193,7 @@ export default function Donation() {
       </div>
       <div className="flex justify-center">
         <div className="w-[628px] h-[509px] bg-[#FFFFFF] border-[1px] rounded-lg relative top-[-60px] p-7">
-          <p className="font-[600] text-[24px]">Buy Jake a Coffee</p>
+          <p className="font-[600] text-[24px]">Buy {name} a Coffee</p>
           <p className="mt-5">Select Amount:</p>
           <div className="flex gap-[8px]">
             {[1, 2, 5, 10].map((amount) => (

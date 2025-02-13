@@ -5,8 +5,7 @@ import Donation from "./_components/donation";
 import Header from "./_components/header";
 
 export default function Page() {
- 
-
+  
   useEffect(() => {
 
     async function getData() {
