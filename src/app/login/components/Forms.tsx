@@ -1,6 +1,7 @@
 import Image from "next/image";
 import * as React from "react"
  import { Label } from "@/components/ui/label"
+ import { useState,useEffect } from "react";
  import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import {
@@ -24,8 +25,20 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Form } from "@/components/ui/form";
+import Link from "next/link";
+import { User } from "@/app/types";
+import { Dispatch,SetStateAction } from "react";
 
+// const addUser=async ()=>{
+//   const res=await fetch("http://localhost:8000/auth/sign-up",{
+//     method:"POST",
+//     headers:{
+//       'Accept': 'application/json',
+//       'Content-Type': 'application/json'
+//     },body:JSON.stringify
+//   })
 
+// }
  
 const formSecondrSchema = z.object({
   username: z.string().min(5,{ message: "Must be 5 or more characters long" }).max(50),
@@ -34,20 +47,21 @@ const formThirdSchema = z.object({
  
   email: z.string().email(),
   password: z.string().min(8).max(50),
-  confirmPassword: z
-  .string()
-  .min(1, { message: 'Please confirm your password' })
+  // confirmPassword: z
+  // .string()
+  // .min(1, { message: 'Please confirm your password' })
   
-}).superRefine((val, ctx) => {
-  if (val.password !== val.confirmPassword) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: 'Password is not the same as confirm password',
-      path: ['confirmPassword'],
-    })
-  }
-  password: z.string().min(8).max(50)
-});
+})
+// .superRefine((val, ctx) => {
+//   if (val.password !== val.confirmPassword) {
+//     ctx.addIssue({
+//       code: z.ZodIssueCode.custom,
+//       message: 'Password is not the same as confirm password',
+//       path: ['confirmPassword'],
+//     })
+//   }
+//   password: z.string().min(8).max(50)
+// });
 const formFirstSchema = z.object({
  
   email: z.string().email(),
@@ -70,12 +84,14 @@ export function SignUp(nextStep:any){
 
     },
   })
- 
   // 2. Define a submit handler.
   function onSubmit1(values: z.infer<typeof formFirstSchema>) {
+    console.log(values);
+  nextStep.nextStep()
+
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    console.log(values)}
+    }
     return(
       <div>
       <Button className="ml-[1000px] mt-5" onClick={nextStep.nextStep}>SignUp</Button>
@@ -98,20 +114,28 @@ export function SignUp(nextStep:any){
               <FormMessage />
             </FormItem>
           )}
-        /> <FormField
+        /> 
+        <FormField
         control={form1.control}
         name="password"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Password</FormLabel>
             <FormControl>
-              <Input className="w-[359px]" placeholder="Enter password here" {...field} />
+              <Input  className="w-[359px]" placeholder="Enter password here" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
         )}
       />
-        <Button onClick={nextStep.nextStep}  type="submit">Submit</Button>
+      <div className="flex gap-10"><Button type="submit">Submit</Button>
+      <div>
+        <Link href={"http://localhost:3000/login/forget-password"}>
+         <div>Forget Password</div> 
+         </Link>
+       </div>
+       </div>
+        
       </form>
        </Form>
     </div>
@@ -119,8 +143,8 @@ export function SignUp(nextStep:any){
     )
   
 }
-export function SecondStep({ changeSign,nextStep}:any){
-  console.log( typeof nextStep)
+export function SecondStep({ changeSign,nextStep,setUsername}:any){
+  // console.log( typeof nextStep)
   const form2 = useForm<z.infer<typeof formSecondrSchema>>({
     resolver: zodResolver(formSecondrSchema),
     defaultValues: {
@@ -130,8 +154,13 @@ export function SecondStep({ changeSign,nextStep}:any){
  
   // 2. Define a submit handler.
   function onSubmit2(values: z.infer<typeof formSecondrSchema>) {
+    setUsername(values.username);
     nextStep()
+    
+
+    
   }
+ 
   return(
     <div>
       <Button  className="ml-[1000px] mt-5" onClick={changeSign}>Login</Button><div className="ml-[450px] mt-[350px]">
@@ -162,8 +191,9 @@ export function SecondStep({ changeSign,nextStep}:any){
     
   )
 }
-export function ThirdStep({ changeSign1,backStep,nextStep}:any){
-  console.log( typeof nextStep)
+export function ThirdStep({ changeSign1,backStep,nextStep,username}:any){
+ 
+  // console.log( typeof changeSign1)
   const form3 = useForm<z.infer<typeof formThirdSchema>>({
     resolver: zodResolver(formThirdSchema),
     defaultValues: {
@@ -173,15 +203,34 @@ export function ThirdStep({ changeSign1,backStep,nextStep}:any){
      
 
     },
-  })
+  });
  
   // 2. Define a submit handler.
   function onSubmit3(values: z.infer<typeof formThirdSchema>) {
-   ///////////////
-   changeSign1()
+    
+   nextStep()
+  
+   const addUser = async ()=>{
+      const res=await fetch("http://localhost:8000/auth/sign-up",{
+        method:"POST",
+        headers:{
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },body:JSON.stringify({
+          username:username,
+          email:values.email,
+          password:values.password
+        })
+      });
+      const data = await res.json();
+      localStorage.setItem("userId", data.data.id);
+    }
+    addUser()
+ 
 
 //daraaan yaah function
    ////////
+  
   }
   return(
     <div> 
@@ -204,7 +253,8 @@ export function ThirdStep({ changeSign1,backStep,nextStep}:any){
               <FormMessage />
             </FormItem>
           )}
-        /> <FormField
+        /> 
+        <FormField
         control={form3.control}
         name="password"
         render={({ field }) => (
@@ -216,12 +266,13 @@ export function ThirdStep({ changeSign1,backStep,nextStep}:any){
             <FormMessage />
           </FormItem>
         )}
-      />
-      <Button onClick={backStep} >back</Button>
-        <Button className="ml-[20px]" onClick={nextStep.nextStep}  type="submit">next</Button>
+        />
+        <Button onClick={backStep} >back</Button>
+        <Button className="ml-[20px]" type="submit">next</Button>
       </form>
        </Form>
-    </div></div>
+    </div>
+    </div>
    
   )
 }

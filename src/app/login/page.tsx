@@ -14,19 +14,16 @@ import { Button } from "@/components/ui/button";
 export default function Home() {
   const [currentStep, setCurrentStep] = useState<number>(1);
   // const [step ,setStep]=useState<number>(1)
-
+export default function Home() {
+  const [username,setUsername]=useState<string>();
+  const [currentStep, setCurrentStep] = useState<number>(1);
+  // const [step ,setStep]=useState<number>(1)
   const changeSign = () => {
     setCurrentStep(currentStep - 1);
   };
   const changeSign1 = () => {
     setCurrentStep(currentStep - 2);
   };
-  // const Step2=()=>{
-  //     setStep(step+1)
-  // }
-  // const Step3=()=>{
-  //     setStep(step+2)
-  // }
   const nextStep = () => {
     setCurrentStep(currentStep + 1);
   };
@@ -38,7 +35,7 @@ export default function Home() {
       {" "}
       <div>
         {" "}
-        <LottieComponent animationData={animationData} />
+        {/* <LottieComponent animationData={animationData} /> */}
       </div>
       <div className="bg-yellow-400 h-screen w-1/2  ">
         <Navigation></Navigation>
@@ -59,15 +56,19 @@ export default function Home() {
       <div className="bg-white ">
         {currentStep == 1 && <SignUp nextStep={nextStep}></SignUp>}
         {currentStep == 2 && (
-          <SecondStep changeSign={changeSign} nextStep={nextStep}></SecondStep>
+          <SecondStep changeSign={changeSign} nextStep={nextStep} setUsername={setUsername}></SecondStep>
+
         )}
         {currentStep == 3 && (
           <ThirdStep
             changeSign1={changeSign1}
             nextStep={nextStep}
             backStep={backStep}
+            username={username}
           ></ThirdStep>
         )}
+         {/* {currentStep == 4 && } */}
+
       </div>
     </div>
   );
