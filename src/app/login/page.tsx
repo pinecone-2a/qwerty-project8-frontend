@@ -25,8 +25,7 @@ export default function Home() {
   };
   return (
     <div className="w-screen h-screen flex">
-      {" "}
-      <div> {/* <LottieComponent animationData={animationData} /> */}</div>
+      {currentStep == 4 && <Profile />}
       {currentStep != 4 && (
         <div className="bg-yellow-400 h-screen w-1/2  ">
           <Navigation></Navigation>
@@ -45,7 +44,7 @@ export default function Home() {
           </div>
         </div>
       )}
-      <div className="bg-white w-full">
+      <div className="bg-white">
         {currentStep == 1 && <SignUp nextStep={nextStep}></SignUp>}
         {currentStep == 2 && (
           <SecondStep
@@ -62,7 +61,6 @@ export default function Home() {
             username={username}
           ></ThirdStep>
         )}
-        {currentStep == 4 && <Profile />}
       </div>
     </div>
   );

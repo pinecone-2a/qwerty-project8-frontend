@@ -138,7 +138,7 @@ export function ProfileNext({
 
   return (
     <>
-      <div className="flex flex-col items-center justify-start mt-[100px]">
+      <div className="flex w-full flex-col items-center justify-start mt-[100px]">
         <div className="grid w-full max-w-sm items-center gap-1.5">
           <p>How would you like to be paid?</p>
           <p className="pb-4 text-sm text-gray-400">

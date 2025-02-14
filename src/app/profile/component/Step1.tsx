@@ -118,7 +118,7 @@ export function ProfileFirst({
   };
   return (
     <>
-      <div className="w-full h-full flex flex-col items-center justify-start mt-[100px]">
+      <div className="w-full flex flex-col items-center justify-start mt-[100px]">
         <div className="grid w-full max-w-sm items-center gap-1.5">
           <p className="pb-4">Complete your profile page</p>
           <Label htmlFor="picture">Add photo</Label>
