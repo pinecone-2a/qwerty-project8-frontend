@@ -11,27 +11,25 @@ import Coffee from "../../../components/Coffee";
 import Lottie from "lottie-react";
 import { Button } from "@/components/ui/button";
 
-
+export default function Home() {
+  const [currentStep, setCurrentStep] = useState<number>(1);
+  // const [step ,setStep]=useState<number>(1)
 export default function Home() {
   const [username,setUsername]=useState<string>();
   const [currentStep, setCurrentStep] = useState<number>(1);
   // const [step ,setStep]=useState<number>(1)
-
   const changeSign = () => {
     setCurrentStep(currentStep - 1);
   };
   const changeSign1 = () => {
     setCurrentStep(currentStep - 2);
   };
- 
   const nextStep = () => {
     setCurrentStep(currentStep + 1);
   };
   const backStep = () => {
     setCurrentStep(currentStep - 1);
   };
-
-  
   return (
     <div className="w-screen h-screen flex">
       {" "}
@@ -59,6 +57,7 @@ export default function Home() {
         {currentStep == 1 && <SignUp nextStep={nextStep}></SignUp>}
         {currentStep == 2 && (
           <SecondStep changeSign={changeSign} nextStep={nextStep} setUsername={setUsername}></SecondStep>
+
         )}
         {currentStep == 3 && (
           <ThirdStep
@@ -69,6 +68,7 @@ export default function Home() {
           ></ThirdStep>
         )}
          {/* {currentStep == 4 && } */}
+
       </div>
     </div>
   );
