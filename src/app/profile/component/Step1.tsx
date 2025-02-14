@@ -39,6 +39,8 @@ export function ProfileFirst({
 }) {
   const [image, setImage] = useState<string | null>(form.image || "");
 
+  const userId = localStorage.getItem("userId");
+
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
@@ -86,7 +88,7 @@ export function ProfileFirst({
         avatarImage: form.image,
         backgroundImage: "",
         successMessage: "",
-        userId: 3,
+        userId: userId,
       };
 
       try {
@@ -116,7 +118,7 @@ export function ProfileFirst({
   };
   return (
     <>
-      <div className="flex flex-col items-center justify-start mt-[100px]">
+      <div className="w-full h-full flex flex-col items-center justify-start mt-[100px]">
         <div className="grid w-full max-w-sm items-center gap-1.5">
           <p className="pb-4">Complete your profile page</p>
           <Label htmlFor="picture">Add photo</Label>

@@ -18,7 +18,7 @@ interface FormData {
   CVC: string;
 }
 
-export default function Home() {
+export function Profile() {
   const [currentStep, setCurrentStep] = useState(1);
   const [form, setForm] = useState({
     name: "",
