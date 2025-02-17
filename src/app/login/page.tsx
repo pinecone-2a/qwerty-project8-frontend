@@ -28,7 +28,7 @@ export default function Home() {
       {" "}
       <div> {/* <LottieComponent animationData={animationData} /> */}</div>
       {currentStep != 4 && (
-        <div className="bg-yellow-400 h-screen w-1/2  ">
+        <div className="bg-yellow-400 h-screen w-3/4  ">
           <Navigation></Navigation>
           <div className="pt-[287px] pl-[240px]">
             <img

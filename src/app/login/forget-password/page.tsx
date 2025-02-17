@@ -20,16 +20,17 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useState,useEffect } from "react";
+import { error } from "console";
 export default function Home(){
   const [newUser,setNewUser]=useState("")
   const addUser=async ()=>{
   const res=await fetch("http://localhost:8000/auth/uptade",{
-    method:"PATCH",
+    method:"PUT",
     headers:{
-      'Accept': 'application/json',
       'Content-Type': 'application/json'
-    },body:JSON.stringify(newUser)
+    },body:JSON.stringify({email:`${newUser}`})
   })
+  console.log(res)
 console.log(newUser)
 }
 
@@ -55,6 +56,7 @@ console.log(newUser)
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="name"></Label>
               <Input onChange={(e)=>setNewUser(e.target.value)} id="name" placeholder="email" />
+              <div>{newUser}</div>
             </div>
           </div>
         </form>
