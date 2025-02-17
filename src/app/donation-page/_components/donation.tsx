@@ -46,7 +46,7 @@ export default function Donation() {
       setProfile(dataJson.secure_url);
 
     }
-  };
+  }
   async function editProfile() {
     await fetch("http://localhost:8000/profile/1", {
       method: "PATCH",
@@ -57,7 +57,8 @@ export default function Donation() {
         name: name,
         about: about,
         avatarImage: profile,
-        socialMediaURL:socialmedia,
+        socialMediaURL: socialmedia,
+        backgroundImage: cover,
       }),
     });
   
