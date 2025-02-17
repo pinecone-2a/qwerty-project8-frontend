@@ -74,7 +74,7 @@ export default function Dashboard() {
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
               <div>
-                <h2 className="text-lg font-semibold">Azaa</h2>
+                <h2 className="text-lg font-semibold">Bilguun</h2>
                 <p className="text-gray-400">buymeacoffee.com/baconpancakes1</p>
               </div>
             </div>
