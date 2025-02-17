@@ -49,7 +49,7 @@ export function ProfileConfirmation({
 }) {
   return (
     <>
-      <div className="flex flex-col items-center justify-start mt-[100px]">
+      <div className="flex w-full flex-col items-center justify-start mt-[100px]">
         <div className="grid w-full max-w-sm items-center gap-1.5">
           <p>Your profile has been created successfully!</p>
         </div>

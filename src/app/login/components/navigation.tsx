@@ -4,7 +4,7 @@ export function Navigation(){
     return(
         <div>
             <div className="flex gap-3 ml-[80px] mt-[32px] text-[16px]">
-        <Coffee />
+            <Coffee />
             <div>Buy Me Coffee</div>
             </div>
         </div>
