@@ -110,6 +110,11 @@ export function ProfileFirst({
         const responseData = await response.json();
         console.log("Response from backend:", responseData);
 
+        localStorage.setItem("name", responseData.name);
+        localStorage.setItem("about", responseData.about);
+        localStorage.setItem("socialMediaURL", responseData.socialmedia);
+        localStorage.setItem("avatarImage", responseData.avatarImage);
+
         setCurrentStep(2);
       } catch (error) {
         console.error("Error submitting form:", error);
@@ -118,7 +123,7 @@ export function ProfileFirst({
   };
   return (
     <>
-      <div className="w-full h-full flex flex-col items-center justify-start mt-[100px]">
+      <div className="w-full flex flex-col items-center justify-start mt-[100px]">
         <div className="grid w-full max-w-sm items-center gap-1.5">
           <p className="pb-4">Complete your profile page</p>
           <Label htmlFor="picture">Add photo</Label>
