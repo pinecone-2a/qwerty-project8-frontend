@@ -110,6 +110,11 @@ export function ProfileFirst({
         const responseData = await response.json();
         console.log("Response from backend:", responseData);
 
+        localStorage.setItem("name", responseData.name);
+        localStorage.setItem("about", responseData.about);
+        localStorage.setItem("socialMediaURL", responseData.socialmedia);
+        localStorage.setItem("avatarImage", responseData.avatarImage);
+
         setCurrentStep(2);
       } catch (error) {
         console.error("Error submitting form:", error);
@@ -174,9 +179,9 @@ export function ProfileFirst({
                 display: "inline-block",
                 width: "160px",
                 height: "160px",
-                borderRadius: "50%",
+                borderRadius: "100%",
                 position: "absolute",
-                left: "0",
+                left: "112px",
                 cursor: "pointer",
               }}
             />
