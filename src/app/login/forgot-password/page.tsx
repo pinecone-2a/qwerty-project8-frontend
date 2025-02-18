@@ -33,10 +33,10 @@ export default function Home() {
   const [isDialogOpen, setIsDialogOpen] = useState(false); // To control dialog visibility
 
   // Email Validation Function
-  const validateEmail = (email: string) => {
-    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-    return emailPattern.test(email);
-  };
+  // const validateEmail = (email: string) => {
+  //   const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+  //   return emailPattern.test(email);
+  // };
 
   // OTP Validation Function
   const validateOTP = (otp: string) => {
@@ -44,12 +44,12 @@ export default function Home() {
   };
 
   const addUser = async () => {
-    if (!validateEmail(newUser)) {
-      alert("Please enter a valid email address.");
-      return;
-    } else {
-      setEmailError(""); // Clear the error if email is valid
-    }
+    // if (!validateEmail(newUser)) {
+    //   alert("Please enter a valid email address.");
+    //   return;
+    // } else {
+    //   setEmailError(""); // Clear the error if email is valid
+    // }
 
     const res = await fetch("http://localhost:8000/auth/update", {
       method: "POST",
@@ -75,10 +75,10 @@ export default function Home() {
       setOtpError(""); // Clear the error if OTP is valid
     }
 
-    if (!validateEmail(newUser)) {
-      alert("Please enter a valid email address.");
-      return;
-    }
+    // if (!validateEmail(newUser)) {
+    //   alert("Please enter a valid email address.");
+    //   return;
+    // }
 
     const res = await fetch("http://localhost:8000/auth/verify-otp", {
       method: "POST",
@@ -87,13 +87,6 @@ export default function Home() {
       },
       body: JSON.stringify({ userOtp: OTP, email: newUser }),
     });
-
-    if (res.ok) {
-      alert("OTP verified successfully!"); // Success message
-      setIsDialogOpen(false); // Close the modal on success
-    } else {
-      alert("OTP verification failed. Please try again."); // Error message
-    }
   };
 
   return (
