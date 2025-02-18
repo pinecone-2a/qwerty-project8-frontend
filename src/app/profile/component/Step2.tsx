@@ -84,6 +84,8 @@ export function ProfileNext({
   const handleContinue = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault(); // Prevent form submission
 
+    const userId = localStorage.getItem("userId");
+
     // Validate the form
     const { isValid, newErrors } = validateProfileNext(form);
 
@@ -107,7 +109,7 @@ export function ProfileNext({
         country: form.country,
         expiryDate: new Date(`${form.year}-${form.month}-01`),
         CVC: Number(form.CVC),
-        user: 1,
+        userId: Number(userId),
       };
 
       try {

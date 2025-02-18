@@ -42,7 +42,7 @@ export const validateProfileNext = (form: FormData) => {
   if (form.lastname.trim() === "") {
     isValid = false;
     newErrors.lastname = "Please enter name";
-  } else if (!lastnameRegex.test(form.about)) {
+  } else if (!lastnameRegex.test(form.name)) {
     isValid = false;
     newErrors.lastname = "Last Name can only contain letters";
   }
