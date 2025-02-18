@@ -81,7 +81,7 @@ export function ProfileNext({
     }
     setForm((prev: any) => ({ ...prev, CVC: value })); // Update state
   };
-  const handleContinue = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleContinue = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault(); // Prevent form submission
 
     // Validate the form
@@ -98,13 +98,47 @@ export function ProfileNext({
     console.log("Updated Errors:", newErrors);
 
     if (isValid) {
-      setCurrentStep(3); // Move to the next step if valid
+      // Prepare the data to be sent to the backend
+
+      const dataToSend = {
+        firstName: form.firstname,
+        lastName: form.lastname,
+        cardNumber: form.card,
+        country: form.country,
+        expiryDate: new Date(`${form.year}-${form.month}-01`),
+        CVC: Number(form.CVC),
+        user: 1,
+      };
+
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/bankcard`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(dataToSend),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to submit form data");
+        }
+
+        const responseData = await response.json();
+        console.log("Response from backend:", responseData);
+
+        setCurrentStep(3);
+      } catch (error) {
+        console.error("Error submitting form:", error);
+      }
     }
   };
 
   return (
     <>
-      <div className="flex flex-col items-center justify-start mt-[100px]">
+      <div className="flex w-full flex-col items-center justify-start mt-[100px]">
         <div className="grid w-full max-w-sm items-center gap-1.5">
           <p>How would you like to be paid?</p>
           <p className="pb-4 text-sm text-gray-400">

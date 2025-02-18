@@ -33,11 +33,8 @@ export const validateProfileFirst = (form: FormData) => {
   }
 
   if (form.about.trim() === "") {
-    isValid = false;
     newErrors.about = "Please enter info about yourself";
-  } else if (!nameRegex.test(form.about)) {
     isValid = false;
-    newErrors.about = "Last Name can only contain letters";
   }
 
   if (form.socialmedia.trim() === "") {

@@ -39,6 +39,8 @@ export function ProfileFirst({
 }) {
   const [image, setImage] = useState<string | null>(form.image || "");
 
+  const userId = localStorage.getItem("userId");
+
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
@@ -61,7 +63,7 @@ export function ProfileFirst({
     setForm((prev: any) => ({ ...prev, [name]: value }));
   };
 
-  const handleContinue = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleContinue = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault(); // Prevent form submission
 
     // Validate the form
@@ -78,13 +80,45 @@ export function ProfileFirst({
     console.log("Updated Errors:", newErrors);
 
     if (isValid) {
-      setCurrentStep(2); // Move to the next step if valid
+      // Prepare the data to be sent to the backend
+      const dataToSend = {
+        name: form.name,
+        about: form.about,
+        socialMediaURL: form.socialmedia,
+        avatarImage: form.image,
+        backgroundImage: "",
+        successMessage: "",
+        userId: userId,
+      };
+
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/profile`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(dataToSend),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to submit form data");
+        }
+
+        const responseData = await response.json();
+        console.log("Response from backend:", responseData);
+
+        setCurrentStep(2);
+      } catch (error) {
+        console.error("Error submitting form:", error);
+      }
     }
   };
-
   return (
     <>
-      <div className="flex flex-col items-center justify-start mt-[100px]">
+      <div className="w-full flex flex-col items-center justify-start mt-[100px]">
         <div className="grid w-full max-w-sm items-center gap-1.5">
           <p className="pb-4">Complete your profile page</p>
           <Label htmlFor="picture">Add photo</Label>
