@@ -9,7 +9,7 @@ import { Profile } from "../profile/profile";
 
 export default function Home() {
   const [username, setUsername] = useState<string>();
-  const [currentStep, setCurrentStep] = useState<number>(4);
+  const [currentStep, setCurrentStep] = useState<number>(1);
   // const [step ,setStep]=useState<number>(1)
   const changeSign = () => {
     setCurrentStep(currentStep - 1);
