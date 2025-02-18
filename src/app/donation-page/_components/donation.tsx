@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
-import { set, z } from "zod";
 
 import {
   Dialog,
@@ -14,9 +13,14 @@ import {
 } from "@/components/ui/dialog";
 import Heart from "../../../../components/Heart";
 import Coffee from "../../../../components/Coffee";
-import e from "cors";
+interface DonationProps {
+  profile: string;
+  name: string;
+  about: string;
+  socialmedia: string;
+}
 
-export default function Donation() {
+export default function Donation({ profile, name, about, socialmedia }: DonationProps) {
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [url, setUrl] = useState("");
   const [message, setMessage] = useState("");
@@ -24,29 +28,21 @@ export default function Donation() {
   const isFormComplete =
     selectedAmount !== null && url.trim() !== "" && message.trim() !== "";
 
-  const [cover, setCover] = useState("")
-  const [profile, setProfile] = useState("")
-  const [name, setName] = useState("");
-  const [about, setAbout] = useState("");
-  const [socialmedia, setSocialmedia] = useState("https://");
+  // const handleProfile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   if (event.target.files && event.target.files.length > 0) {
+  //     const file = event.target.files[0];
+  //     const data = new FormData();
+  //     data.append("file", file);
+  //     data.append("upload_preset", "buy_me_coffee");
 
-
-  const handleProfile = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 0) {
-      const file = event.target.files[0];
-      const data = new FormData();
-      data.append("file", file);
-      data.append("upload_preset", "buy_me_coffee");
-
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/dabc04pmm/upload`,
-        { method: "POST", body: data }
-      );
-      const dataJson = await response.json();
-      setProfile(dataJson.secure_url);
-
-    }
-  }
+  //     const response = await fetch(
+  //       `https://api.cloudinary.com/v1_1/dabc04pmm/upload`,
+  //       { method: "POST", body: data }
+  //     );
+  //     const dataJson = await response.json();
+  //     setProfile(dataJson.secure_url);
+  //   }
+  // }
   async function editProfile() {
     await fetch("http://localhost:8000/profile/1", {
       method: "PATCH",
@@ -58,23 +54,11 @@ export default function Donation() {
         about: about,
         avatarImage: profile,
         socialMediaURL: socialmedia,
-        backgroundImage: cover,
       }),
     });
-  
   }
 
-  useEffect(() => {
-    async function fetchProfile() {
-      const response = await fetch("http://localhost:8000/profile/1");
-      const data = await response.json();
-      setProfile(data[0].avatarImage);
-      setName(data[0].name);
-      setAbout(data[0].about);
-      setSocialmedia(data[0].socialMediaURL);
-    }
-    fetchProfile();
-  }, []);
+
 
   return (
     <div className="flex justify-center">
@@ -124,7 +108,7 @@ export default function Donation() {
                     id="profile-upload"
                     type="file"
                     className="hidden"
-                    onChange={handleProfile}
+                    // onChange={handleProfile}
                   />
                   <div className="mt-10">
                     <p>Name</p>
@@ -132,19 +116,19 @@ export default function Donation() {
                       name="name"
                       type="text"
                       defaultValue={name}
-                      onChange={(e) => setName(e.target.value)}
+                      // onChange={(e) => setName(e.target.value)}
                       className="w-[460px] h-[40px] border-[1px] rounded-md p-3"
                     />
                   </div>
                   <p className="mb-[5px] mt-[5px]">About</p>
-                  <Textarea name="about" defaultValue={about} onChange={(e) => setAbout(e.target.value)}/>
+                  <Textarea name="about" defaultValue={about} />
                   <p className="mb-[5px] mt-[5px]">Social Media URL</p>
                   <input
                     name="socialmedia"
                     type="text"
                     className="w-[460px] h-[40px] border-[1px] rounded-md p-3"
                     defaultValue={socialmedia}
-                    onChange={(e) => setSocialmedia(e.target.value)}
+                    // onChange={(e) => setSocialmedia(e.target.value)}
                   />
                   <div className="flex gap-2 justify-end mt-[30px]">
                     <DialogClose

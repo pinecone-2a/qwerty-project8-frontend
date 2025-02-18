@@ -1,35 +1,49 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Cover from "./_components/cover";
 import Donation from "./_components/donation";
 import Header from "./_components/header";
 
+
+interface ProfileData {
+  avatarImage: string;
+  name: string;
+  about: string;
+  socialmedia: string;
+}
+
 export default function Page() {
-  
+  const [profile, setProfile] = useState<ProfileData>({
+    avatarImage: "",
+    name: "",
+    about: "",
+    socialmedia: "",
+  });
+
   useEffect(() => {
-
-    async function getData() {
-      if(process.env.NEXT_PUBLIC_BACKEND_URL){
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/profile`;
-      try {
-        const response = await fetch(url);
-        const data = await response.json();
-        console.log(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-      }
+    async function fetchProfile() {
+      const response = await fetch("http://localhost:8000/profile/1");
+      const data: ProfileData[] = await response.json(); 
+      setProfile({
+        avatarImage: data[0].avatarImage,
+        name: data[0].name,
+        about: data[0].about,
+        socialmedia: data[0].socialmedia,
+      });
     }
-    getData();
-
-
+    fetchProfile();
   }, []);
 
   return (
     <>
       <Header />
       <Cover />
-      <Donation />
+      <Donation
+        profile={profile.avatarImage}
+        name={profile.name}
+        about={profile.about}
+        socialmedia={profile.socialmedia}
+      />
     </>
   );
 }
