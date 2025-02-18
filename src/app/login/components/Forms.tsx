@@ -217,6 +217,7 @@ export function ThirdStep({ changeSign1, backStep, nextStep, username }: any) {
       }),
     });
     const data = await res.json();
+    console.log(data);
     localStorage.setItem("userId", data.data.id);
     nextStep();
   }

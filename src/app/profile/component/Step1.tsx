@@ -88,7 +88,7 @@ export function ProfileFirst({
         avatarImage: form.image,
         backgroundImage: "",
         successMessage: "",
-        userId: userId,
+        userId: Number(userId),
       };
 
       try {
@@ -109,11 +109,6 @@ export function ProfileFirst({
 
         const responseData = await response.json();
         console.log("Response from backend:", responseData);
-
-        localStorage.setItem("name", responseData.name);
-        localStorage.setItem("about", responseData.about);
-        localStorage.setItem("socialMediaURL", responseData.socialmedia);
-        localStorage.setItem("avatarImage", responseData.avatarImage);
 
         setCurrentStep(2);
       } catch (error) {
