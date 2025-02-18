@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/dialog";
 import Heart from "../../../../components/Heart";
 import Coffee from "../../../../components/Coffee";
-import e from "cors";
 
 export default function Donation() {
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
@@ -24,12 +23,11 @@ export default function Donation() {
   const isFormComplete =
     selectedAmount !== null && url.trim() !== "" && message.trim() !== "";
 
-  const [cover, setCover] = useState("")
-  const [profile, setProfile] = useState("")
+  const [cover, setCover] = useState("");
+  const [profile, setProfile] = useState("");
   const [name, setName] = useState("");
   const [about, setAbout] = useState("");
   const [socialmedia, setSocialmedia] = useState("https://");
-
 
   const handleProfile = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -44,9 +42,8 @@ export default function Donation() {
       );
       const dataJson = await response.json();
       setProfile(dataJson.secure_url);
-
     }
-  }
+  };
   async function editProfile() {
     await fetch("http://localhost:8000/profile/1", {
       method: "PATCH",
@@ -61,7 +58,6 @@ export default function Donation() {
         backgroundImage: cover,
       }),
     });
-  
   }
 
   useEffect(() => {
@@ -137,7 +133,11 @@ export default function Donation() {
                     />
                   </div>
                   <p className="mb-[5px] mt-[5px]">About</p>
-                  <Textarea name="about" defaultValue={about} onChange={(e) => setAbout(e.target.value)}/>
+                  <Textarea
+                    name="about"
+                    defaultValue={about}
+                    onChange={(e) => setAbout(e.target.value)}
+                  />
                   <p className="mb-[5px] mt-[5px]">Social Media URL</p>
                   <input
                     name="socialmedia"
@@ -147,9 +147,7 @@ export default function Donation() {
                     onChange={(e) => setSocialmedia(e.target.value)}
                   />
                   <div className="flex gap-2 justify-end mt-[30px]">
-                    <DialogClose
-                      className="w-[79px] h-[40px] bg-[#F4F4F5] rounded-md flex justify-center items-center"
-                    >
+                    <DialogClose className="w-[79px] h-[40px] bg-[#F4F4F5] rounded-md flex justify-center items-center">
                       Cancel
                     </DialogClose>
                     <DialogClose
