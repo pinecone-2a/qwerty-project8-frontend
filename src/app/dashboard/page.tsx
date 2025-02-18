@@ -46,17 +46,42 @@ export default function Dashboard() {
   const [transaction, setTransaction] = useState<Transaction[]>([]);
 
   useEffect(() => {
-    const userId = "1";
+    const userId = 2;
+    const port = `http://localhost:8000`;
 
-    fetch(`/api/total-earnings/${userId}`)
-      .then((Response) => Response.json())
-      .then((data) => setEarnings(data.earnings))
-      .catch((err) => console.error("ERROR", err));
+    fetch(`${port}/donation/total-earnings/${userId}`)
+      .then((response) => {
+        if (!response.ok) {
+          console.error(
+            "Failed to fetch total earnings, Status:",
+            response.status
+          );
+          return Promise.reject("Failed to fetch total earnings");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Total earnings:", data);
+        setEarnings(data.earnings);
+      })
+      .catch((err) => console.error("Error fetching total earnings:", err));
 
-    fetch(`/api/donation/recieved${userId}`)
-      .then((Response) => Response.json())
-      .then((data) => setTransaction(data))
-      .catch((err) => console.error("ERROR", err));
+    fetch(`${port}/donation/received/${userId}`)
+      .then((response) => {
+        if (!response.ok) {
+          console.error(
+            "Failed to fetch received donations, Status:",
+            response.status
+          );
+          return Promise.reject("Failed to fetch received donations");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Received donations:", data);
+        setTransaction(data);
+      })
+      .catch((err) => console.error("Error fetching received donations:", err));
   }, []);
 
   const filteredTransactions = filterAmount
