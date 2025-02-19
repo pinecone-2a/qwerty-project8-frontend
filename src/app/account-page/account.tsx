@@ -20,7 +20,7 @@ type FormData = {
   userId: number;
 };
 
-export default function Home({
+export function Home({
   form = {
     name: "",
     about: "",
