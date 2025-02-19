@@ -1,5 +1,5 @@
 import React from "react";
-import { FiCoffee } from "react-icons/fi";
+import { CiSearch } from "react-icons/ci";
 
 interface Creator {
   name: string;
@@ -34,44 +34,19 @@ const creators: Creator[] = [
 
 const ExploreCreators: React.FC = () => {
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      <aside className="w-64 bg-white p-6 shadow-md">
-        <h1 className="text-xl font-bold mb-6 flex gap-3">
-          <FiCoffee size={28} /> Buy Me Coffee
-        </h1>
-        <nav>
-          <ul>
-            <li className="mb-4">
-              <a href="/dashboard" className="text-gray-700 hover:text-black">
-                Home
-              </a>
-            </li>
-            <li className="mb-4">
-              <a href="/dashboard/explore" className="text-gray-700 font-bold">
-                Explore
-              </a>
-            </li>
-            <li className="mb-4">
-              <a href="#" className="text-gray-700 hover:text-black">
-                View page ↗
-              </a>
-            </li>
-            <li>
-              <a href="#" className="text-gray-700 hover:text-black">
-                Account settings
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </aside>
-
-      <main className="flex-1 p-10">
-        <h2 className="text-2xl font-semibold mb-4">Explore creators</h2>
-        <input
-          type="text"
-          placeholder="Search name"
-          className="w-full p-2 mb-4 border rounded"
-        />
+    <div className="flex h-screen bg-white">
+      <main className="flex-1 px-10">
+        <h2 className="text-2xl font-semibold mb-4 text-black">
+          Explore creators
+        </h2>
+        <div className="w-[243px] h-9 border border-[#e4e4e7] flex gap-1 items-center rounded">
+          <CiSearch size={20} color="black" className="ml-2" />
+          <input
+            type="text"
+            placeholder={`Search name`}
+            className="border-none w-full h-full outline-none text-black"
+          />
+        </div>
         <div className="space-y-4">
           {creators.map((creator, index) => (
             <div

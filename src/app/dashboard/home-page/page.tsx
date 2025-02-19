@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,10 +10,8 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ChevronDown } from "lucide-react";
-import Link from "next/link";
-import { GrShare } from "react-icons/gr";
-import Navigation from "../_components/Navigation";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ChevronDown, Copy } from "lucide-react";
 
 interface Transaction {
   name: string;
@@ -23,129 +21,134 @@ interface Transaction {
   timeAgo: string;
 }
 
-const transactions: Transaction[] = [
-  {
-    name: "Cutiez",
-    profileUrl: "buymeacoffee.com/kissyface",
-    amount: 2,
-    timeAgo: "10 mins ago",
-  },
-  {
-    name: "Guest",
-    profileUrl: "instagram.com/weleisley",
-    message: "Thank you for being so awesome everyday!",
-    amount: 1,
-    timeAgo: "5 hours ago",
-  },
-  {
-    name: "John Doe",
-    profileUrl: "buymeacoffee.com/bdsadas",
-    message: "Thank you for being so awesome everyday!",
-    amount: 10,
-    timeAgo: "10 hours ago",
-  },
-  {
-    name: "Radicals",
-    profileUrl: "buymeacoffee.com/gkfgrew",
-    amount: 2,
-    timeAgo: "1 day ago",
-  },
-  {
-    name: "Guest",
-    profileUrl: "facebook.com/penelpoeb",
-    amount: 5,
-    timeAgo: "2 days ago",
-  },
-];
-
 export default function Dashboard() {
-  const [earnings, setEarnings] = useState(450);
+  const [copied, setCopied] = useState(false);
+  const [earnings, setEarnings] = useState(0);
   const [filterAmount, setFilterAmount] = useState<number | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+
+  useEffect(() => {
+    const userId = 2;
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+    async function fetchEarnings() {
+      try {
+        const response = await fetch(
+          `${API_URL}/donation/total-earnings/${userId}`
+        );
+        if (!response.ok) throw new Error("Failed to fetch earnings");
+        const data = await response.json();
+        setEarnings(data.earnings);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    async function fetchTransactions() {
+      try {
+        const response = await fetch(`${API_URL}/donation/received/${userId}`);
+        if (!response.ok) throw new Error("Failed to fetch transactions");
+        const data = await response.json();
+        setTransactions(data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    fetchEarnings();
+    fetchTransactions();
+  }, []);
+
+  const handleShareLink = async () => {
+    try {
+      await navigator.clipboard.writeText("https://www.instagram.com/");
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1000);
+    } catch (error) {
+      alert("Failed to copy the link.");
+      console.error(error);
+    }
+  };
 
   const filteredTransactions = filterAmount
     ? transactions.filter((t) => t.amount === filterAmount)
     : transactions;
 
   return (
-    <div className="min-h-screen text-white p-6">
-      <div className="flex flex-col w-60 h-9 mt-4 ml-14">
-        <Link
-          href="/dashboard/home-page"
-          className="w-60 h-9 bg-[#f4f4f5] mt-1 font-medium text-black shadow-none hover:bg-[#f4f4f5]"
-        >
-          <Button className="bg-[#f4f4f5] w-60 font-medium text-black shadow-none hover:bg-[#f4f4f5] focus:bg-[#f4f4f5]">
-            {" "}
-            Home
-          </Button>
-        </Link>
-        <Button className="bg-white mt-1 text-black shadow-none hover:bg-[#f4f4f5] focus:bg-[#f4f4f5]">
-          Explore
-        </Button>
-        <Button className="bg-white mt-1 text-black shadow-none hover:bg-[#f4f4f5] focus:bg-[#f4f4f5]">
-          View page <GrShare />{" "}
-        </Button>
-        <Button className="bg-white mt-1 text-black shadow-none hover:bg-[#f4f4f5] focus:bg-[#f4f4f5]">
-          Account settings
-        </Button>
-      </div>
-      <div className="max-w-2xl mx-auto -mt-16">
-        <Card className=" p-6 rounded-lg shadow-lg w-[907px]">
+    <div className="h-screen text-white ml-40">
+      <div className="w-[1000px] h-screen mx-auto">
+        <Card className="p-6 rounded-lg shadow-lg">
           <div className="mt-4 flex justify-between items-center">
-            <div>
-              <h2 className="text-lg font-semibold">Jake</h2>
-              <h3 className="text-gray-400">buymeacoffee.com/baconpancakes1</h3>
+            <div className="flex items-center gap-6">
+              <Avatar>
+                <AvatarImage src="https://github.com/shadcn.png" />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+              <div>
+                <h2 className="text-lg font-semibold">Bilguun</h2>
+                <p className="text-gray-400">buymeacoffee.com/baconpancakes1</p>
+              </div>
             </div>
-            <Button className="bg-white text-black hover:bg-[#E4E4E7]">
-              Share page link
-            </Button>
+            <div className="p-1">
+              <button
+                onClick={handleShareLink}
+                className="bg-black text-white px-2 py-2 rounded-md flex"
+              >
+                <Copy className="p-2" />
+                Share page link
+              </button>
+              {copied && (
+                <p className="text-green-500 mt-2 text-sm">✅ Link copied!</p>
+              )}
+            </div>
           </div>
-          <div className="border border-[#E4E4E7] w-full mt-5"> </div>
-          <div className="mt-4 flex gap-5 items-center">
+          <div className="mt-4 flex justify-between items-center">
             <h3 className="text-lg font-semibold">Earnings</h3>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button className="bg-white text-black hover:bg-[#E4E4E7]">
-                  Last 30 days <ChevronDown />{" "}
+                <Button className="flex gap-4 border border-solid bg-white text-black hover:bg-white">
+                  Last 30 days <ChevronDown />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
+              <DropdownMenuContent align="start">
                 <DropdownMenuItem>Last 7 days</DropdownMenuItem>
                 <DropdownMenuItem>Last 30 days</DropdownMenuItem>
                 <DropdownMenuItem>Last 60 days</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          <h3 className="text-4xl font-bold mt-2">${earnings}</h3>
+          <p className="text-4xl font-bold mt-2">${earnings}</p>
         </Card>
-        <Card className="p-6 mt-6 rounded-lg shadow-lg w-[907px]">
+        <Card className="p-6 mt-6 rounded-lg shadow-lg">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-semibold">Recent transactions</h3>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button className="bg-white text-black hover:bg-[#E4E4E7]">
+                <Button className="flex gap-4 border border-dashed bg-white text-black hover:bg-white">
                   Amount <ChevronDown />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 {[1, 2, 5, 10].map((amount) => (
-                  <DropdownMenuItem key={amount}>
-                    <Checkbox
-                      checked={filterAmount === amount}
-                      onCheckedChange={() =>
-                        setFilterAmount(filterAmount === amount ? null : amount)
-                      }
-                    />
+                  <DropdownMenuItem
+                    key={amount}
+                    onClick={() =>
+                      setFilterAmount(filterAmount === amount ? null : amount)
+                    }
+                  >
+                    <Checkbox checked={filterAmount === amount} />
                     <span className="ml-2">${amount}</span>
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          <div className="mt-4 space-y-4">
+
+          <div className="mt-4 space-y-4 overflow-y-auto max-h-[520px]">
             {filteredTransactions.map((transaction, index) => (
               <Card
                 key={index}
-                className="p-4 rounded-lg flex justify-between items-start shadow-none border-none"
+                className="p-4 rounded-lg flex justify-between items-start"
               >
                 <div>
                   <p className="font-semibold text-black">{transaction.name}</p>
@@ -157,13 +160,13 @@ export default function Dashboard() {
                       {transaction.message}
                     </p>
                   )}
-                </div>
-                <h3 className="font-semibold text-black">
-                  + ${transaction.amount}
-                  <p className="text-gray-400 text-xs mt-1 font-normal">
+                  <p className="text-gray-400 text-xs mt-1">
                     {transaction.timeAgo}
                   </p>
-                </h3>
+                </div>
+                <p className="font-semibold text-green-400">
+                  + ${transaction.amount}
+                </p>
               </Card>
             ))}
           </div>
