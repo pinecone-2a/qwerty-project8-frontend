@@ -1,18 +1,6 @@
 "use client";
-import { useState } from "react";
 import * as React from "react";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { EditProfile } from "@/app/donation-page/edit-profile";
 
 interface FormData {
   name: string;
@@ -48,12 +36,9 @@ export function ProfileConfirmation({
   setErrors: any;
 }) {
   return (
-    <>
-      <div className="flex w-full flex-col items-center justify-start mt-[100px]">
-        <div className="grid w-full max-w-sm items-center gap-1.5">
-          <p>Your profile has been created successfully!</p>
-        </div>
-      </div>
-    </>
+  <div className="w-full h-full">
+    <EditProfile/>
+  </div>
+      
   );
 }

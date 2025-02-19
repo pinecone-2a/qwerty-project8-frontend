@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
-
 import {
   Dialog,
   DialogContent,
@@ -13,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import Heart from "../../../../components/Heart";
 import Coffee from "../../../../components/Coffee";
+
 interface DonationProps {
   profile: string;
   name: string;
@@ -24,41 +24,69 @@ export default function Donation({ profile, name, about, socialmedia }: Donation
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [url, setUrl] = useState("");
   const [message, setMessage] = useState("");
+  const [currentProfile, setCurrentProfile] = useState("");
+  const [currentName, setCurrentName] = useState("");
+  const [currentAbout, setCurrentAbout] = useState("");
+  const [currentSocialMedia, setCurrentSocialMedia] = useState("");
 
-  const isFormComplete =
-    selectedAmount !== null && url.trim() !== "" && message.trim() !== "";
+  const isFormComplete = selectedAmount !== null && url.trim() !== "" && message.trim() !== "";
 
-  // const handleProfile = async (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   if (event.target.files && event.target.files.length > 0) {
-  //     const file = event.target.files[0];
-  //     const data = new FormData();
-  //     data.append("file", file);
-  //     data.append("upload_preset", "buy_me_coffee");
+  const handleImageUpload = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "buy_me_coffee");
 
-  //     const response = await fetch(
-  //       `https://api.cloudinary.com/v1_1/dabc04pmm/upload`,
-  //       { method: "POST", body: data }
-  //     );
-  //     const dataJson = await response.json();
-  //     setProfile(dataJson.secure_url);
-  //   }
-  // }
-  async function editProfile() {
-    await fetch("http://localhost:8000/profile/1", {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: name,
-        about: about,
-        avatarImage: profile,
-        socialMediaURL: socialmedia,
-      }),
-    });
-  }
+    try {
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/dabc04pmm/upload`,
+        { method: "POST", body: formData }
+      );
+      const data = await response.json();
+      setCurrentProfile(data.secure_url);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    }
+  };
 
+  const user = localStorage.getItem("userId");
 
+  const editProfile = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/profile/1", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: currentName,
+          about: currentAbout,
+          avatarImage: currentProfile,
+          socialMediaURL: currentSocialMedia,
+          user: Number(user)
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to update profile");
+      }
+  
+      const data = await response.json();
+
+      setCurrentProfile(data.update.avatarImage);
+      setCurrentName(data.update.name);
+      setCurrentAbout(data.update.about);
+      setCurrentSocialMedia(data.update.socialMediaURL);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+    }
+  };
+
+  useEffect(() => {
+      setCurrentProfile(profile);
+      setCurrentName(name);
+      setCurrentAbout(about);
+      setCurrentSocialMedia(socialmedia);
+  }, [profile, name, about, socialmedia]);
 
   return (
     <div className="flex justify-center">
@@ -69,14 +97,14 @@ export default function Donation({ profile, name, about, socialmedia }: Donation
               <div
                 className="w-[40px] h-[40px]"
                 style={{
-                  backgroundImage: `url(${profile})`,
+                  backgroundImage: `url(${currentProfile})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                   borderRadius: "50%",
                 }}
               ></div>
               <p className="text-black font-[700] text-[20px] leading-[20px]">
-                {name}
+                {currentName}
               </p>
             </div>
             <Dialog>
@@ -87,63 +115,64 @@ export default function Donation({ profile, name, about, socialmedia }: Donation
                 <DialogHeader>
                   <DialogTitle>Edit Profile</DialogTitle>
                   <DialogDescription>
-                    Make changes to your profile here. Click save when you're
-                    done
+                    Make changes to your profile here. Click save when you're done
                   </DialogDescription>
                 </DialogHeader>
                 <p>Add Photo</p>
-                <form action={editProfile}>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    editProfile();
+                  }}
+                >
                   <label
                     htmlFor="profile-upload"
                     className="cursor-pointer w-[160px] h-[160px] bg-[#F4F4F5] rounded-lg flex items-center justify-center"
                     style={{
-                      backgroundImage: `url(${profile})`,
+                      backgroundImage: `url(${currentProfile})`,
                       backgroundSize: "cover",
                       backgroundPosition: "center",
                       borderRadius: "50%",
                     }}
-                  ></label>
-                  <input
-                    name="profile-upload"
-                    id="profile-upload"
-                    type="file"
-                    className="hidden"
-                    // onChange={handleProfile}
-                  />
+                  >
+                    <input
+                      id="profile-upload"
+                      type="file"
+                      className="hidden"
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          handleImageUpload(e.target.files[0]);
+                        }
+                      }}
+                    />
+                  </label>
                   <div className="mt-10">
                     <p>Name</p>
                     <input
-                      name="name"
                       type="text"
-                      defaultValue={name}
-                      // onChange={(e) => setName(e.target.value)}
+                      value={currentName}
+                      onChange={(e) => setCurrentName(e.target.value)}
                       className="w-[460px] h-[40px] border-[1px] rounded-md p-3"
                     />
                   </div>
                   <p className="mb-[5px] mt-[5px]">About</p>
-                  <Textarea name="about" defaultValue={about} />
+                  <Textarea
+                    value={currentAbout}
+                    onChange={(e) => setCurrentAbout(e.target.value)}
+                  />
                   <p className="mb-[5px] mt-[5px]">Social Media URL</p>
                   <input
-                    name="socialmedia"
                     type="text"
+                    value={currentSocialMedia}
+                    onChange={(e) => setCurrentSocialMedia(e.target.value)}
                     className="w-[460px] h-[40px] border-[1px] rounded-md p-3"
-                    defaultValue={socialmedia}
-                    // onChange={(e) => setSocialmedia(e.target.value)}
                   />
                   <div className="flex gap-2 justify-end mt-[30px]">
-                    <DialogClose
-                      className="w-[79px] h-[40px] bg-[#F4F4F5] rounded-md flex justify-center items-center"
-                    >
+                    <DialogClose className="w-[79px] h-[40px] bg-[#F4F4F5] rounded-md flex justify-center items-center">
                       Cancel
                     </DialogClose>
                     <DialogClose
-                      onClick={(e) => {
-                        const form = e.currentTarget.closest("form"); // Find the nearest form
-                        if (form) {
-                          const formData = new FormData(form);
-                          editProfile();
-                        }
-                      }}
+                      type="submit"
                       className="w-[126px] h-[40px] bg-[#18181B] text-[white] rounded-md flex justify-center items-center"
                     >
                       Save Changes
@@ -156,29 +185,28 @@ export default function Donation({ profile, name, about, socialmedia }: Donation
           <div className="w-full h-[1px] border-[1px] mt-6"></div>
           <div className="mt-6">
             <p className="font-[600] text-[16px] leading-[24px]">
-              About {name}
+              About {currentName}
             </p>
-            <p className="mt-3">{about}</p>
+            <p className="mt-3">{currentAbout}</p>
           </div>
         </div>
         <div className="w-[632px] h-[116px] border-[1px] border-[#E4E4E7] rounded-lg m-5 p-5 bg-[#FFFFFF]">
           <p className="font-[600] text-[16px]">Social Media URL</p>
-          <p className="mt-3">{socialmedia}</p>
+          <p className="mt-3">{currentSocialMedia}</p>
         </div>
         <div className="w-[632px] h-[236px] border-[1px] border-[#E4E4E7] rounded-lg m-5 p-5 bg-[#FFFFFF]">
           <p className="font-[600] text-[16px]">Recent Supporters</p>
-
           <div className="w-[584px] h-[140px] border-[1px] rounded-lg mt-5">
             <div className="flex items-center gap-4 flex-col h-full justify-center">
               <Heart />
-              <p className="font-[600]">Be the first one to support Jake</p>
+              <p className="font-[600]">Be the first one to support {currentName}</p>
             </div>
           </div>
         </div>
       </div>
       <div className="flex justify-center">
         <div className="w-[628px] h-[509px] bg-[#FFFFFF] border-[1px] rounded-lg relative top-[-60px] p-7">
-          <p className="font-[600] text-[24px]">Buy {name} a Coffee</p>
+          <p className="font-[600] text-[24px]">Buy {currentName} a Coffee</p>
           <p className="mt-5">Select Amount:</p>
           <div className="flex gap-[8px]">
             {[1, 2, 5, 10].map((amount) => (
@@ -212,7 +240,7 @@ export default function Donation({ profile, name, about, socialmedia }: Donation
             <p className="font-[500] mt-5 mb-2">Special Message:</p>
             <Textarea
               placeholder="Please write your message here"
-              value={message || ""} // Prevent undefined
+              value={message || ""}
               onChange={(e) => setMessage(e.target.value)}
             />
           </div>
