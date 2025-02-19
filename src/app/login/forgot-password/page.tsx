@@ -58,6 +58,7 @@ export default function Home() {
       },
       body: JSON.stringify({ email: newUser }),
     });
+    console.log(res)
 
     if (res.ok) {
       alert("Sent OTP"); // Success message
