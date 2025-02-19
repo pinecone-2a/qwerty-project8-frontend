@@ -58,13 +58,13 @@ export default function Home() {
       },
       body: JSON.stringify({ email: newUser }),
     });
-    console.log(res)
+    console.log(res.status)
 
-    if (res.ok) {
-      alert("Sent OTP"); // Success message
-      setIsDialogOpen(true); // Open the modal to enter OTP
-    } else {
-      alert("Failed to add user. Please try again."); // Error message
+    if (res.status===409) {alert("Failed to add user. Please try again.")
+     ; // Open the modal to enter OTP
+    } else { alert("Sent OTP"); // Success message
+      setIsDialogOpen(true)
+      ; // Error message
     }
   };
 
@@ -72,9 +72,7 @@ export default function Home() {
     if (!validateOTP(OTP)) {
       alert("Please enter a valid 6-digit OTP.");
       return;
-    } else {
-      setOtpError(""); // Clear the error if OTP is valid
-    }
+    } 
 
     // if (!validateEmail(newUser)) {
     //   alert("Please enter a valid email address.");
@@ -88,6 +86,14 @@ export default function Home() {
       },
       body: JSON.stringify({ userOtp: OTP, email: newUser }),
     });
+    console.log(res)
+    if (res.status===404) {
+      alert("OTP incorrect")
+      ; // Open the modal to enter OTP
+     } else { alert("OTP correct"); // Success message
+       setIsDialogOpen(true)
+       ; // Error message
+     }
   };
 
   return (

@@ -127,7 +127,7 @@ export function SignUp(nextStep: any) {
             <div className="flex gap-10">
               <Button type="submit">Submit</Button>
               <div>
-                <Link href={"http://localhost:3001/login/forgot-password"}>
+                <Link href={"/login/forgot-password"}>
                   <div>Forgot Password</div>
                 </Link>
               </div>
