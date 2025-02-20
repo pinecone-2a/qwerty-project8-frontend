@@ -37,7 +37,11 @@ export function EditProfile() {
 
   return (
     <>
-      <Header />
+      <Header 
+      profile={profile.avatarImage}
+      name={profile.name}
+      about={profile.about}
+      socialmedia={profile.socialmedia}/>
       <Cover />
       <Donation
         profile={profile.avatarImage}

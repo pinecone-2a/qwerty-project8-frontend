@@ -20,16 +20,59 @@ interface DonationProps {
   socialmedia: string;
 }
 
-export default function Donation({ profile, name, about, socialmedia }: DonationProps) {
+export default function Donation({
+  profile,
+  name,
+  about,
+  socialmedia,
+}: DonationProps) {
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [url, setUrl] = useState("");
   const [message, setMessage] = useState("");
   const [currentProfile, setCurrentProfile] = useState("");
   const [currentName, setCurrentName] = useState("");
   const [currentAbout, setCurrentAbout] = useState("");
-  const [currentSocialMedia, setCurrentSocialMedia] = useState("");
+  const [currentSocialMedia, setCurrentSocialMedia] = useState<string>(
+    socialmedia || ""
+  );
+  const [user, setUser] = useState<string | null>(null);
 
-  const isFormComplete = selectedAmount !== null && url.trim() !== "" && message.trim() !== "";
+  const isFormComplete =
+    selectedAmount !== null && url.trim() !== "" && message.trim() !== "";
+
+  useEffect(() => {
+    const savedProfile = localStorage.getItem("profile");
+    const savedName = localStorage.getItem("name");
+    const savedAbout = localStorage.getItem("about");
+    const savedSocialMedia = localStorage.getItem("socialmedia");
+    const savedUserId = localStorage.getItem("userId");
+
+    setCurrentProfile(savedProfile || profile);
+    setCurrentName(savedName || name);
+    setCurrentAbout(savedAbout || about);
+    setCurrentSocialMedia(savedSocialMedia || socialmedia || "");
+    if (savedUserId) setUser(savedUserId);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("profile", currentProfile);
+  }, [currentProfile]);
+
+  useEffect(() => {
+    localStorage.setItem("name", currentName);
+  }, [currentName]);
+
+  useEffect(() => {
+    localStorage.setItem("about", currentAbout);
+  }, [currentAbout]);
+
+  useEffect(() => {
+    localStorage.setItem("socialmedia", currentSocialMedia);
+  }, [currentSocialMedia]);
+
+  useEffect(() => {
+    if (user) localStorage.setItem("userId", user);
+  }, [user]);
 
   const handleImageUpload = async (file: File) => {
     const formData = new FormData();
@@ -48,28 +91,32 @@ export default function Donation({ profile, name, about, socialmedia }: Donation
     }
   };
 
-  const user = localStorage.getItem("userId");
-
   const editProfile = async () => {
+    if (!user) {
+      console.error("No user ID found");
+      return;
+    }
+
     try {
-      const response = await fetch("http://localhost:8000/profile/1", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: currentName,
-          about: currentAbout,
-          avatarImage: currentProfile,
-          socialMediaURL: currentSocialMedia,
-          user: Number(user)
-        }),
-      });
-  
-      if (!response.ok) {
-        throw new Error("Failed to update profile");
-      }
-  
+      const response = await fetch(
+        `http://localhost:8000/profile/${Number(user)}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: currentName,
+            about: currentAbout,
+            avatarImage: currentProfile,
+            socialMediaURL: currentSocialMedia,
+            user: Number(user),
+          }),
+        }
+      );
+
+      if (!response.ok) throw new Error("Failed to update profile");
+
       const data = await response.json();
 
       setCurrentProfile(data.update.avatarImage);
@@ -80,14 +127,6 @@ export default function Donation({ profile, name, about, socialmedia }: Donation
       console.error("Error updating profile:", error);
     }
   };
-
-  useEffect(() => {
-      setCurrentProfile(profile);
-      setCurrentName(name);
-      setCurrentAbout(about);
-      setCurrentSocialMedia(socialmedia);
-  }, [profile, name, about, socialmedia]);
-
   return (
     <div className="flex justify-center">
       <div className="relative top-[-80px]">
@@ -115,7 +154,8 @@ export default function Donation({ profile, name, about, socialmedia }: Donation
                 <DialogHeader>
                   <DialogTitle>Edit Profile</DialogTitle>
                   <DialogDescription>
-                    Make changes to your profile here. Click save when you're done
+                    Make changes to your profile here. Click save when you're
+                    done
                   </DialogDescription>
                 </DialogHeader>
                 <p>Add Photo</p>
@@ -163,10 +203,11 @@ export default function Donation({ profile, name, about, socialmedia }: Donation
                   <p className="mb-[5px] mt-[5px]">Social Media URL</p>
                   <input
                     type="text"
-                    value={currentSocialMedia}
+                    value={currentSocialMedia ?? ""}
                     onChange={(e) => setCurrentSocialMedia(e.target.value)}
                     className="w-[460px] h-[40px] border-[1px] rounded-md p-3"
                   />
+
                   <div className="flex gap-2 justify-end mt-[30px]">
                     <DialogClose className="w-[79px] h-[40px] bg-[#F4F4F5] rounded-md flex justify-center items-center">
                       Cancel
@@ -199,7 +240,9 @@ export default function Donation({ profile, name, about, socialmedia }: Donation
           <div className="w-[584px] h-[140px] border-[1px] rounded-lg mt-5">
             <div className="flex items-center gap-4 flex-col h-full justify-center">
               <Heart />
-              <p className="font-[600]">Be the first one to support {currentName}</p>
+              <p className="font-[600]">
+                Be the first one to support {currentName}
+              </p>
             </div>
           </div>
         </div>

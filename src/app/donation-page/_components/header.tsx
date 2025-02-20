@@ -1,59 +1,85 @@
 "use client";
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Bottom from "../../../../components/b-arrow";
 
-export default function Header() {
-  const [cover, setCover] = useState("")
-    const [profile, setProfile] = useState("")
-    const [name, setName] = useState("");
-    const [about, setAbout] = useState("");
-    const [socialmedia, setSocialmedia] = useState("https://");
-  
-  
-    const handleProfile = async (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (event.target.files && event.target.files.length > 0) {
-        const file = event.target.files[0];
-        const data = new FormData();
-        data.append("file", file);
-        data.append("upload_preset", "buy_me_coffee");
-  
-        const response = await fetch(
-          `https://api.cloudinary.com/v1_1/dabc04pmm/upload`,
-          { method: "POST", body: data }
-        );
-        const dataJson = await response.json();
-        setProfile(dataJson.secure_url);
-  
-      }
-    };
-    async function editProfile() {
-      await fetch("http://localhost:8000/profile/1", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: name,
-          about: about,
-          avatarImage: profile,
-          socialMediaURL:socialmedia,
-        }),
-      });
-    
+interface DonationProps {
+  profile: string;
+  name: string;
+  about: string;
+  socialmedia: string;
+}
+
+export default function Donation({
+  profile,
+  name,
+  about,
+  socialmedia,
+}: DonationProps) {
+  const [currentProfile, setCurrentProfile] = useState("");
+  const [currentName, setCurrentName] = useState("");
+  const [user, setUser] = useState<string | null>(null);
+
+
+
+  useEffect(() => {
+    const savedProfile = localStorage.getItem("profile");
+    const savedName = localStorage.getItem("name");
+    const savedUserId = localStorage.getItem("userId");
+
+    setCurrentProfile(savedProfile || profile);
+    setCurrentName(savedName || name);
+    if (savedUserId) setUser(savedUserId);
+  }, []);
+
+  const handleImageUpload = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "buy_me_coffee");
+
+    try {
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/dabc04pmm/upload`,
+        { method: "POST", body: formData }
+      );
+      const data = await response.json();
+      setCurrentProfile(data.secure_url);
+    } catch (error) {
+      console.error("Error uploading image:", error);
     }
-  
-    useEffect(() => {
-      async function fetchProfile() {
-        const response = await fetch("http://localhost:8000/profile/1");
-        const data = await response.json();
-        setProfile(data[0].avatarImage);
-        setName(data[0].name);
-        setAbout(data[0].about);
-        setSocialmedia(data[0].socialMediaURL);
-      }
-      fetchProfile();
-    }, []);
+  };
+
+  const editProfile = async () => {
+    if (!user) {
+      console.error("No user ID found");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:8000/profile/${Number(user)}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: currentName,
+            avatarImage: currentProfile,
+            user: Number(user),
+          }),
+        }
+      );
+
+      if (!response.ok) throw new Error("Failed to update profile");
+      
+      const data = await response.json();
+
+      setCurrentProfile(data.update.avatarImage);
+      setCurrentName(data.update.name);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+    }
+  };
   
   return (
     <header className="w-full h-[56px] bg-[#FFFFFF] flex items-center justify-between">
@@ -64,13 +90,13 @@ export default function Header() {
         <div
           className="w-[40px] h-[40px]"
           style={{
-            backgroundImage: `url(${profile})`,
+            backgroundImage: `url(${currentProfile})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             borderRadius: "50%",
           }}
         ></div>
-        <p className="text-black">{name}</p>
+        <p className="text-black">{currentName}</p>
         <Bottom />
       </div>
     </header>
