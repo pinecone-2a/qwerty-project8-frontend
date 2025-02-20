@@ -68,9 +68,35 @@ export function SignUp(nextStep: any) {
     },
   });
   // 2. Define a submit handler.
-  function onSubmit1(values: z.infer<typeof formFirstSchema>) {
+  async function onSubmit1(values: z.infer<typeof formFirstSchema>) {
     console.log(values);
-    nextStep.nextStep();
+    
+    const res = await fetch("http://localhost:8000/auth/sign-in", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: values.email,
+        password: values.password,
+      }),
+}); const data = await res.json();
+    console.log(data);
+    if(res.status===400){
+  alert("user not found ")
+
+    }else if(res.status===404){
+      alert("password incorrect")
+    }else{
+      alert ("signed")
+       localStorage.setItem("userId", data.data.id);
+    }  
+   
+    
+   
+    
+    
 
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
@@ -114,7 +140,7 @@ export function SignUp(nextStep: any) {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input
+                    <Input type="password"
                       className="w-[359px]"
                       placeholder="Enter password here"
                       {...field}
