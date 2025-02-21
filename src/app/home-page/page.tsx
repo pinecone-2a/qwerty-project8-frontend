@@ -1,9 +1,15 @@
 "use client";
-
-import { useState } from "react";
+import { useCookies } from "next-client-cookies";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface Transaction {
@@ -25,6 +31,27 @@ const transactions: Transaction[] = [
 export default function Dashboard() {
   const [earnings, setEarnings] = useState(450);
   const [filterAmount, setFilterAmount] = useState<number | null>(null);
+  const cookies = useCookies();
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);  // Хүлээж байгаа байдал
+
+  // useEffect хуук дотор async үйлдлүүдийг гүйцэтгэнэ
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch("http://localhost:8000/auth/refresh");
+        const data = await res.json();
+        console.log(data);
+        cookies.set("accessToken", data.result);
+        cookies.set("refreshToken", data.refreshToken);
+      } catch (error) {
+        console.error("Алдаа гарлаа", error);
+      } finally {
+        setLoading(false); // Хүлээж байгаа байдал дуусахад
+      }
+    };
+    fetchData();
+  }, [cookies]);
 
   const filteredTransactions = filterAmount
     ? transactions.filter((t) => t.amount === filterAmount)

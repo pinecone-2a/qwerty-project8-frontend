@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { CookiesProvider } from "next-client-cookies";  // Import CookiesProvider
+import { useState } from "react";
+import { useCookies } from "next-client-cookies";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
