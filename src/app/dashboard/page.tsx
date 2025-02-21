@@ -1,10 +1,13 @@
 "use client";
 
+import Navigation from "./_components/Navigation";
+import Sidebar from "./_components/SideBar";
+
 export default function HomePage() {
   return (
     <div>
-      <h1 className="text-2xl font-bold">Dashboard Home</h1>
-      <p>Welcome to your dashboard!</p>
+      <Navigation />
+      <Sidebar />
     </div>
   );
 }
