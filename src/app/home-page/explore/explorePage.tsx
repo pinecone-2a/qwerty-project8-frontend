@@ -5,36 +5,19 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SquareArrowOutUpRight, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+
 import { useCookies } from "next-client-cookies";
-import { jwtDecode } from "jwt-decode";
+import { jwtDecode, JwtPayload } from "jwt-decode";
+
 import { SkeletonCard } from "../_components/Skeleton";
-
-interface Profile {
-  id: number;
-  userId: number;
-  name: string;
-  avatarImage: string;
-  about: string;
-  socialMediaURL: string;
-}
-
 export default function Explore() {
-  const [data, setData] = useState<Profile[]>([]);
+  const [data, setData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [filteredData, setFilteredData] = useState<Profile[]>([]);
+  const [filteredData, setFilteredData] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const cookies = useCookies();
   const accessToken = cookies.get("accessToken") || "";
-  let userId: number | null = null;
-
-  if (accessToken) {
-    try {
-      const decodedToken: any = jwtDecode(accessToken);
-      userId = decodedToken?.userId ?? null;
-    } catch (error) {
-      console.error("Error decoding token:", error);
-    }
-  }
+  const { userId } = jwtDecode(accessToken) as JwtPayload & { userId: string };
 
   async function getFetchData() {
     try {
@@ -42,22 +25,15 @@ export default function Explore() {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/profile/explore`,
         {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
           credentials: "include",
         }
       );
-
-      if (!res.ok) throw new Error("Failed to fetch profiles");
-
-      const result: Profile[] = await res.json();
-      const filteredProfiles = result.filter(
-        (profile) => profile.userId !== userId
+      const result = await res.json();
+      const filteredData = result.filter(
+        (profile: any) => profile.userId !== userId
       );
-      setData(filteredProfiles);
-      setFilteredData(filteredProfiles);
+      setData(filteredData);
+      setFilteredData(result);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -70,7 +46,7 @@ export default function Explore() {
   }, []);
 
   useEffect(() => {
-    if (!searchTerm.trim()) {
+    if (searchTerm.trim() === "") {
       setFilteredData(data);
     } else {
       setFilteredData(
@@ -82,12 +58,13 @@ export default function Explore() {
   }, [searchTerm, data]);
 
   return (
-    <div className="w-full flex justify-center">
-      <div className="w-[1000px]">
+    <div>
+      <div className="w-[1000px] ml-20">
         <div className="flex gap-2 flex-col mb-10">
-          <h1 className="mb-5 mt-8 font-extrabold text-[32px]">
+          <div className="mb-5 mt-8 font-extrabold text-[32px]">
             Explore Creators
-          </h1>
+          </div>
+
           <div className="relative">
             <Input
               className="w-[243px] pl-10"
@@ -108,39 +85,36 @@ export default function Explore() {
               <SkeletonCard width="1000px" height="250px" />
             </div>
           ) : filteredData.length > 0 ? (
-            filteredData.map((profile) => (
+            filteredData.map((profile: any) => (
               <Card key={profile.id} className="mb-10">
                 <CardContent className="h-[250px] p-6 px-10">
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between">
                     <div className="flex items-center gap-4 text-xl font-semibold">
                       <Avatar>
-                        <AvatarImage
-                          src={profile.avatarImage}
-                          alt={profile.name}
-                        />
-                        <AvatarFallback>
-                          {profile.name?.charAt(0)}
-                        </AvatarFallback>
+                        <AvatarImage src={profile.avatarImage} />
+                        <AvatarFallback>CN</AvatarFallback>
                       </Avatar>
                       {profile.name}
                     </div>
-                    <Link href={`/viewpage/${profile.name}`}>
-                      <Button>
-                        View page <SquareArrowOutUpRight />
-                      </Button>
-                    </Link>
+                    <div>
+                      <Link href={`/viewpage/${profile.name}`}>
+                        <Button>
+                          View page <SquareArrowOutUpRight />
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
-                  <div className="flex gap-7 mt-6">
-                    <div className="flex flex-col w-[420px]">
-                      <h2 className="font-semibold text-[16px]">
+                  <div className="flex  gap-7 mt-6">
+                    <div className="flex flex-col">
+                      <h1 className="font-semibold text-[16px]">
                         About {profile.name}
-                      </h2>
-                      <p className="text-sm mt-4">{profile.about}</p>
+                      </h1>
+                      <p className="text-sm mt-4 w-[420px]">{profile.about}</p>
                     </div>
                     <div className="flex flex-col">
-                      <h2 className="font-semibold text-[16px]">
-                        Social Media
-                      </h2>
+                      <h1 className="font-semibold text-[16px]">
+                        Social media URL
+                      </h1>
                       <p className="text-sm mt-4">{profile.socialMediaURL}</p>
                     </div>
                   </div>
