@@ -19,21 +19,33 @@ export function EditProfile() {
     about: "",
     socialmedia: "",
   });
+  const [user, setUser] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchProfile() {
-      const response = await fetch("http://localhost:8000/profile/1");
-      const data: ProfileData[] = await response.json(); 
-
-      setProfile({
-        avatarImage: data[0].avatarImage,
-        name: data[0].name,
-        about: data[0].about,
-        socialmedia: data[0].socialmedia,
-      });
+      if (!user) return;
+  
+      try {
+        const response = await fetch(`http://localhost:8000/profile/${Number(user)}`);
+        const data: ProfileData[] = await response.json();
+  
+        if (data.length > 0) {
+          setProfile({
+            avatarImage: data[0].avatarImage || "",
+            name: data[0].name || "",
+            about: data[0].about || "",
+            socialmedia: data[0].socialmedia || "",
+          });
+        } else {
+          console.error("Profile data is empty");
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
     }
+  
     fetchProfile();
-  }, []);
+  }, [user]);
 
   return (
     <>
