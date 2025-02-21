@@ -127,8 +127,8 @@ export function SignUp(nextStep: any) {
             <div className="flex gap-10">
               <Button type="submit">Submit</Button>
               <div>
-                <Link href={"http://localhost:3000/login/forget-password"}>
-                  <div>Forget Password</div>
+                <Link href={"/login/forgot-password"}>
+                  <div>Forgot Password</div>
                 </Link>
               </div>
             </div>
@@ -217,6 +217,7 @@ export function ThirdStep({ changeSign1, backStep, nextStep, username }: any) {
       }),
     });
     const data = await res.json();
+    console.log(data);
     localStorage.setItem("userId", data.data.id);
     nextStep();
   }
